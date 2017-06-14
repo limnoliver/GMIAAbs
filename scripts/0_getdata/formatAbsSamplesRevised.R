@@ -31,21 +31,24 @@ formatAbsSamplesRevised <- function(dateLower,dateUpper,Type,Project){
   dateRangeFilesd <- dateRangeFilesd[which(nchar(dateRangeFilesd)<10)]
   dateRangeFilesd <- paste('2015/',dateRangeFilesd,sep="")
   
-  dateRangeFilesd <- list.files(path='//igsarmewwshg9/HG9Data/AquaLog/AquaLog_Data/2016')
-  dateRangeFilesd <- dateRangeFilesd[which(dateRangeFilesd <= dateUpper)]
-  dateRangeFilesd <- dateRangeFilesd[which(dateRangeFilesd >= dateLower)]
-  dateRangeFilesd <- dateRangeFilesd[which(nchar(dateRangeFilesd)<10)]
-  dateRangeFilesd <- paste('2016/',dateRangeFilesd,sep="")
+  dateRangeFilese <- list.files(path='//igsarmewwshg9/HG9Data/AquaLog/AquaLog_Data/2016')
+  dateRangeFilese <- dateRangeFilese[which(dateRangeFilese <= dateUpper)]
+  dateRangeFilese <- dateRangeFilese[which(dateRangeFilese >= dateLower)]
+  dateRangeFilese <- dateRangeFilese[which(nchar(dateRangeFilese)<10)]
+  dateRangeFilese <- paste('2016/',dateRangeFilese,sep="")
   
-  dateRangeFilesd <- list.files(path='//igsarmewwshg9/HG9Data/AquaLog/AquaLog_Data/2017')
-  dateRangeFilesd <- dateRangeFilesd[which(dateRangeFilesd <= dateUpper)]
-  dateRangeFilesd <- dateRangeFilesd[which(dateRangeFilesd >= dateLower)]
-  dateRangeFilesd <- dateRangeFilesd[which(nchar(dateRangeFilesd)<10)]
-  dateRangeFilesd <- paste('2017/',dateRangeFilesd,sep="")
+  dateRangeFilesf <- list.files(path='//igsarmewwshg9/HG9Data/AquaLog/AquaLog_Data/2017')
+  dateRangeFilesf <- dateRangeFilesf[which(dateRangeFilesf <= dateUpper)]
+  dateRangeFilesf <- dateRangeFilesf[which(dateRangeFilesf >= dateLower)]
+  dateRangeFilesf <- dateRangeFilesf[which(nchar(dateRangeFilesf)<10)]
+  dateRangeFilesf <- paste('2017/',dateRangeFilesf,sep="")
   
   dateRangeFiles <- dateRangeFilesb
   dateRangeFiles <- append(dateRangeFiles,dateRangeFilesc)
   dateRangeFiles <- append(dateRangeFiles,dateRangeFilesd)
+  dateRangeFiles <- append(dateRangeFiles, dateRangeFilese)
+  dateRangeFiles <- append(dateRangeFiles, dateRangeFilesf)
+  
   #dateRangeFiles <- dateRangeFiles[-which(dateRangeFiles=='20150223')]
   #dateRangeFiles <- dateRangeFiles[-which(dateRangeFiles=='2014/20141219')]
   
