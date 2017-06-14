@@ -31,6 +31,18 @@ formatAbsSamplesJT <- function(dateLower,dateUpper,Type,Project){
   dateRangeFilesd <- dateRangeFilesd[which(nchar(dateRangeFilesd)<10)]
   dateRangeFilesd <- paste('2015/',dateRangeFilesd,sep="")
   
+  dateRangeFilesd <- list.files(path='//igsarmewwshg9/HG9Data/AquaLog/AquaLog_Data/2016')
+  dateRangeFilesd <- dateRangeFilesd[which(dateRangeFilesd <= dateUpper)]
+  dateRangeFilesd <- dateRangeFilesd[which(dateRangeFilesd >= dateLower)]
+  dateRangeFilesd <- dateRangeFilesd[which(nchar(dateRangeFilesd)<10)]
+  dateRangeFilesd <- paste('2016/',dateRangeFilesd,sep="")
+  
+  dateRangeFilesd <- list.files(path='//igsarmewwshg9/HG9Data/AquaLog/AquaLog_Data/2017')
+  dateRangeFilesd <- dateRangeFilesd[which(dateRangeFilesd <= dateUpper)]
+  dateRangeFilesd <- dateRangeFilesd[which(dateRangeFilesd >= dateLower)]
+  dateRangeFilesd <- dateRangeFilesd[which(nchar(dateRangeFilesd)<10)]
+  dateRangeFilesd <- paste('2017/',dateRangeFilesd,sep="")
+  
   dateRangeFiles <- dateRangeFilesb
   dateRangeFiles <- append(dateRangeFiles,dateRangeFilesc)
   dateRangeFiles <- append(dateRangeFiles,dateRangeFilesd)
