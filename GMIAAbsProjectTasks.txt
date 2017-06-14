@@ -1,0 +1,38 @@
+GMIA absorbance/dyes task
+
+1. Gather data
+ -Aqualog
+ -W.Q. data
+ -DOC data
+ 
+2. Process data
+ -Extract needed absorbance data
+
+3. Merge data
+ -W.Q. + Aualog + DOC
+ -Double check that all data is present
+   -If there is Aqualog data, there should be W.Q. and DOC data.
+   -There will be W.Q. data when there is not associated Aqualog and DOC data
+
+
+   
+4. Data analysis: regressions
+ -Response variables: 
+   COD
+   BOD
+   Propylene Glycol (PG)
+   sum of triazoles: 4-methyl + 5-methyl
+   Acetate
+   multivariate: PG and Acetate
+   
+ -IVs
+   Signals used previously are:
+	All absorbance columns: we shold revisit this with consideration of the quality of data with wvlngth > 400
+	Spectral slopes (Sag): file = SagVals.csv
+	Residuals: Defined towards the bottom of the absDataPrep.R script. Currently using 491, 422, and 629. We should revisit this and consider other wavelengths.
+ 
+ -Regression
+	LASSO regression for initial variable selection followed by 
+	Tobit regression (censored value regression) using the survival package
+	  -this is a slight deviation from Jessica's scripts. 
+   
