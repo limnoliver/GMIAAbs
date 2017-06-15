@@ -1,7 +1,7 @@
 GMIA absorbance/dyes task
 
 1. Gather data
- -Aqualog
+ -Aqualog [Sam completed import of newer data - revised formatAbsSamplesRevised to work with new data]
  -W.Q. data
  -DOC data
  
