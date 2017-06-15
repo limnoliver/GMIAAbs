@@ -1,0 +1,55 @@
+GMIA absorbance/dyes task
+
+1. Gather data
+ -Aqualog
+ -W.Q. data
+ -DOC data
+ 
+2. Process data
+ -Extract needed absorbance data
+
+3. Merge data
+ -W.Q. + Aualog + DOC
+ -Double check that all data is present
+   -If there is Aqualog data, there should be W.Q. and DOC data.
+   -There will be W.Q. data when there is not associated Aqualog and DOC data
+
+
+   
+4. Data analysis: regressions
+ -Response variables: 
+   COD
+   BOD
+   Propylene Glycol (PG)
+   sum of triazoles: 4-methyl + 5-methyl
+   Acetate
+   multivariate: PG and Acetate
+   
+ -IVs
+   Signals used previously are:
+	All absorbance columns: we shold revisit this with consideration of the quality of data with wvlngth > 400
+	Spectral slopes (Sag): file = SagVals.csv
+	Residuals: Defined towards the bottom of the absDataPrep.R script. Currently using 491, 422, and 629. We should revisit this and consider other wavelengths.
+ 
+ -Regression
+	LASSO regression for initial variable selection followed by 
+	Tobit regression (censored value regression) using the survival package
+	  -this is a slight deviation from Jessica's scripts
+	  -Lasso regression used previously is in this script: A-LassoGMIA.R
+		This script runs adaptive lasso for defined response and IVs, then routes results into a censored regression (Tobit regression using the censReg package). I would like to get away from the censReg package and use the survival package for this.
+		-example of survival package use for censored environmental data analysis is here: 
+			
+			# response = data for response variable. censored = boolean for censored or uncensored, type = left censored.
+			library(survival)
+			y <- Surv(response, censored, type="left") 			
+			form <- formula(paste('y ~',paste(IVs,collapse=' + ')))
+			msurv <- survreg(form,data=dfPred)
+			summary(msurv)
+			
+		-It will be valuable to do a stepwise regression using the LASSO variables in this Tobit regression, and 
+		examine the added value of each variable--see below for graphics to help with this.
+			
+	* Discussion needed on exact approach for these regressions going forward
+   
+ -Generate graphics for each regression similar to CODcens_plotSteps.pdf
+	Enables us to evaluate the added value of each extra variable
