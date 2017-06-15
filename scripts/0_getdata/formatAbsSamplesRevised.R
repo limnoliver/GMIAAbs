@@ -79,8 +79,21 @@ formatAbsSamplesRevised <- function(dateLower,dateUpper,Type,Project){
       DescriptionFile <- DescriptionFile[which(DescriptionFile[,1] !=''),]
       } else {
       DescriptionFile <- read_xlsx(DescriptionFile[grep('.xlsx', DescriptionFile)],col_names=TRUE)
-      DescriptionFile <- DescriptionFile[which(DescriptionFile[,1] !=''),]
-      
+      if (all(is.na(DescriptionFile$ActivityStartDate))){
+        as.character(DescriptionFile$ActivityStartDate)
+        as.character(DescriptionFile$ActivityStartTime.Time)
+      } else {
+        DescriptionFile$ActivityStartTime.Time <- as.character(strftime(DescriptionFile$ActivityStartTime.Time, '%H:%M:%S', tz = 'UTC'))
+        DescriptionFile$ActivityStartDate <- as.character(format(DescriptionFile$ActivityStartDate, "%D"))
+      }
+      if (all(is.na(DescriptionFile$ActivityEndDate))){
+        as.character(DescriptionFile$ActivityEndDate)
+        as.character(DescriptionFile$ActivityEndTime.Time)
+      } else {
+        DescriptionFile$ActivityEndTime.Time <- as.character(strftime(DescriptionFile$ActivityEndTime.Time, '%H:%M:%S', tz = 'UTC'))
+        DescriptionFile$ActivityEndDate <- as.character(format(DescriptionFile$ActivityEndDate, "%D"))
+      }
+     
       }
     
       if (Project == ''){
@@ -120,10 +133,10 @@ formatAbsSamplesRevised <- function(dateLower,dateUpper,Type,Project){
         DescriptionFile <- DescriptionFile[which(DescriptionFile[,1] != 'Baseline'),]
       } 
       
-      filesNeeded <- DescriptionFile[,c(1,3)]
+      filesNeeded <- as.data.frame(DescriptionFile[,c(1,3)])
       if (sum(nchar(filesNeeded[,2]))>0) {
         filesNeed <- paste(filesNeeded[,2],'ABS.dat',sep='')
-        dilution <- DescriptionFile[,4]
+        dilution <- as.data.frame(DescriptionFile)[,4]
         names(dilution) <- filesNeed
         
         AbsfileNames <- filesNeed[which(filesNeed!='ABS.dat')]
