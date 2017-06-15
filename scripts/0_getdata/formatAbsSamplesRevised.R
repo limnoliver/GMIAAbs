@@ -80,19 +80,20 @@ formatAbsSamplesRevised <- function(dateLower,dateUpper,Type,Project){
       } else {
       DescriptionFile <- read_xlsx(DescriptionFile[grep('.xlsx', DescriptionFile)],col_names=TRUE)
       if (all(is.na(DescriptionFile$ActivityStartDate))){
-        as.character(DescriptionFile$ActivityStartDate)
-        as.character(DescriptionFile$ActivityStartTime.Time)
+        DescriptionFile$ActivityStartDate <- as.character(DescriptionFile$ActivityStartDate)
+        DescriptionFile$ActivityStartTime.Time <- as.character(DescriptionFile$ActivityStartTime.Time)
       } else {
         DescriptionFile$ActivityStartTime.Time <- as.character(strftime(DescriptionFile$ActivityStartTime.Time, '%H:%M:%S', tz = 'UTC'))
         DescriptionFile$ActivityStartDate <- as.character(format(DescriptionFile$ActivityStartDate, "%D"))
       }
       if (all(is.na(DescriptionFile$ActivityEndDate))){
-        as.character(DescriptionFile$ActivityEndDate)
-        as.character(DescriptionFile$ActivityEndTime.Time)
+        DescriptionFile$ActivityEndDate <- as.character(DescriptionFile$ActivityEndDate)
+        DescriptionFile$ActivityEndTime.Time <- as.character(DescriptionFile$ActivityEndTime.Time)
       } else {
         DescriptionFile$ActivityEndTime.Time <- as.character(strftime(DescriptionFile$ActivityEndTime.Time, '%H:%M:%S', tz = 'UTC'))
         DescriptionFile$ActivityEndDate <- as.character(format(DescriptionFile$ActivityEndDate, "%D"))
       }
+      DescriptionFile <- as.data.frame(DescriptionFile)
      
       }
     
