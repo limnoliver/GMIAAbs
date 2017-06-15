@@ -4,30 +4,36 @@ source("scripts/0_getdata/formatAbsSamplesRevised.R")
 
 # collate data
 FinalAbsDf <- formatAbsSamplesRevised(dateLower='20130930',dateUpper='20170113',Type='All',Project='GMIA')
+# remove columns with NA names
 FinalAbsDf2 <- FinalAbsDf[,names(FinalAbsDf) != "NA"]
+
+
+
 #clean up column names
 testnames <- colnames(FinalAbsDf2)
 testnames <- gsub("USGS","Group",testnames)
 colnames(FinalAbsDf2) <- testnames
 
-# not sure why it's getting rid of this specific instance
-# 
-# get rid of NA columns
-# get rid of last column that is wavelengths
+# get rid of last column name that is wavelengths
 testnames <- testnames[-length(testnames)]
-testnames <- testnames[which(!testnames=="NA")]
+
+# make a data frame that will become summary table for getAbs function
 test <- data.frame(testnames,stringsAsFactors=FALSE)
+
 colnames(test) <- "GRnumber"
 wavs <- unique(FinalAbsDf2$Wavelength)
 wavs <- wavs[which(wavs<=700)]
 
-finalcols <- colnames(FinalAbsDf2)
-finalcols <- finalcols[which(substr(finalcols,1,2) %in% c("OU","Ou","CG","LK","OA","Wa"))]
-FinalAbsDf2 <- FinalAbsDf2[,finalcols]
-
 # get rid of NA values 
 library(USGSHydroOpt)
 testAbs <- getAbs(FinalAbsDf2,'Wavelength',wavs,"Group",test,"GRnumber")
+
+# appears to get rid of standards/blanks
+# this appears to be identifying samples of interest -- where columns
+# start with the identifiers "ou"...etc. Gets rid of blanks, 1%, ETC
+finalcols <- colnames(FinalAbsDf2)
+finalcols <- finalcols[which(substr(finalcols,1,2) %in% c("OU","Ou","CG","LK","OA","Wa"))]
+FinalAbsDf2 <- FinalAbsDf2[,finalcols]
 
 setwd("C:/Users/jlthomps/Desktop/git/GMIA/")
 write.csv(testAbs,file="testAbs.csv")
