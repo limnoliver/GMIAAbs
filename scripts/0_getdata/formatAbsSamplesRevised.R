@@ -78,9 +78,12 @@ formatAbsSamplesRevised <- function(dateLower,dateUpper,Type,Project){
       DescriptionFile <- read.csv(DescriptionFile[grep('.csv', DescriptionFile)],header=TRUE,stringsAsFactors=FALSE)
       DescriptionFile <- DescriptionFile[which(DescriptionFile[,1] !=''),]
       } else {
-        
-      DescriptionFile <- read_xlsx(DescriptionFile[grep('.xlsx', DescriptionFile)],col_names=TRUE)
-        
+      filename <- DescriptionFile  
+      DescriptionFile <- read_xlsx(DescriptionFile[grep('.xlsx', DescriptionFile)],col_names=TRUE,na = c("", NA, "HH:MM:SS", "MM/DD/YYYY"))
+      if (length(grep("X_", names(DescriptionFile)))>0) {
+        DescriptionFile <- read_xlsx(filename[grep('.xlsx', filename)],col_names=TRUE, skip=10,na = c("", NA, "HH:MM:SS", "MM/DD/YYYY"))
+      }
+      
       if (all(is.na(DescriptionFile$ActivityStartDate))){
         DescriptionFile$ActivityStartDate <- as.character(DescriptionFile$ActivityStartDate)
         DescriptionFile$ActivityStartTime.Time <- as.character(DescriptionFile$ActivityStartTime.Time)
