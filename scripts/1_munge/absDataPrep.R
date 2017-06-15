@@ -1,34 +1,3 @@
-library(USGSAqualogFormatting)
-# source revised formatAbsSamples function
-source("scripts/0_getdata/formatAbsSamplesRevised.R")
-
-# collate data
-FinalAbsDf <- formatAbsSamplesRevised(dateLower='20130930',dateUpper='20170113',Type='All',Project='GMIA')
-# remove columns with NA names
-FinalAbsDf2 <- FinalAbsDf[,names(FinalAbsDf) != "NA"]
-
-
-
-#clean up column names
-testnames <- colnames(FinalAbsDf2)
-testnames <- gsub("USGS","Group",testnames)
-colnames(FinalAbsDf2) <- testnames
-
-# get rid of last column name that is wavelengths
-testnames <- testnames[-length(testnames)]
-
-# make a data frame that will become summary table for getAbs function
-test <- data.frame(testnames,stringsAsFactors=FALSE)
-
-colnames(test) <- "GRnumber"
-wavs <- unique(FinalAbsDf2$Wavelength)
-wavs <- wavs[which(wavs<=700)]
-
-# get rid of NA values 
-library(USGSHydroOpt)
-testAbs <- getAbs(FinalAbsDf2,'Wavelength',wavs,"Group",test,"GRnumber")
-
-# write data to cached 
 
 # appears to get rid of standards/blanks
 # this appears to be identifying samples of interest -- where columns
@@ -37,7 +6,7 @@ finalcols <- colnames(FinalAbsDf2)
 finalcols <- finalcols[which(substr(finalcols,1,2) %in% c("OU","Ou","CG","LK","OA","Wa"))]
 FinalAbsDf2 <- FinalAbsDf2[,finalcols]
 
-setwd("/GMIA/")
+
 write.csv(testAbs,file="testAbs.csv")
 write.csv(FinalAbsDf,file="FinalAbsDf.csv")
 save(testAbs,file="testAbs.RData")
