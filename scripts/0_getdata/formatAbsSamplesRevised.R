@@ -4,6 +4,9 @@
 # added line 32 in testing
 # added if in line 101 to exclude entries with na dilution
 # changed filesNeeded into to include project information in output
+# had to do some fooling around in function b/c of missing files in 20140121b
+# also added Project ID to name so can differentiate OUT/LK/CG
+
 library(readxl)
 
 formatAbsSamplesRevised <- function(dateLower,dateUpper,Type,Project){
