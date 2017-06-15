@@ -28,6 +28,8 @@ wavs <- wavs[which(wavs<=700)]
 library(USGSHydroOpt)
 testAbs <- getAbs(FinalAbsDf2,'Wavelength',wavs,"Group",test,"GRnumber")
 
+# write data to cached 
+
 # appears to get rid of standards/blanks
 # this appears to be identifying samples of interest -- where columns
 # start with the identifiers "ou"...etc. Gets rid of blanks, 1%, ETC
@@ -35,7 +37,7 @@ finalcols <- colnames(FinalAbsDf2)
 finalcols <- finalcols[which(substr(finalcols,1,2) %in% c("OU","Ou","CG","LK","OA","Wa"))]
 FinalAbsDf2 <- FinalAbsDf2[,finalcols]
 
-setwd("C:/Users/jlthomps/Desktop/git/GMIA/")
+setwd("/GMIA/")
 write.csv(testAbs,file="testAbs.csv")
 write.csv(FinalAbsDf,file="FinalAbsDf.csv")
 save(testAbs,file="testAbs.RData")
