@@ -71,18 +71,16 @@ formatAbsSamplesRevised <- function(dateLower,dateUpper,Type,Project){
     
     DescriptionFile <- allFiles[grep('Sample Log',allFiles)]
 
-    if (length(DescriptionFile)==0) {
+    if (length(DescriptionFile)==0|length(grep('.xlsx', DescriptionFile))>1|length(grep('Test', DescriptionFile))>0) {
       AbsList[[i]] <- NA
     } else {
       if (length(grep('.csv', DescriptionFile))>0){
       DescriptionFile <- read.csv(DescriptionFile[grep('.csv', DescriptionFile)],header=TRUE,stringsAsFactors=FALSE)
       DescriptionFile <- DescriptionFile[which(DescriptionFile[,1] !=''),]
       } else {
-        if (length(grep('.xlsx', DescriptionFile))>1) {
-          AbsList[[i]] <- NA
-        } else {
+        
       DescriptionFile <- read_xlsx(DescriptionFile[grep('.xlsx', DescriptionFile)],col_names=TRUE)
-        }
+        
       if (all(is.na(DescriptionFile$ActivityStartDate))){
         DescriptionFile$ActivityStartDate <- as.character(DescriptionFile$ActivityStartDate)
         DescriptionFile$ActivityStartTime.Time <- as.character(DescriptionFile$ActivityStartTime.Time)
