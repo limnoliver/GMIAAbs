@@ -1,20 +1,26 @@
 library(USGSAqualogFormatting)
+# source revised formatAbsSamples function
 source("scripts/0_getdata/formatAbsSamplesRevised.R")
-FinalAbsDf_test <- formatAbsSamplesRevised(dateLower='20130930',dateUpper='20170113',Type='All',Project='GMIA')
-# had to do some fooling around in function b/c of missing files in 20140121b
-# also added Project ID to name so can differentiate OUT/LK/CG
+FinalAbsDf <- formatAbsSamplesRevised(dateLower='20130930',dateUpper='20170113',Type='All',Project='GMIA')
 
+#clean up column names
 testnames <- colnames(FinalAbsDf)
 testnames <- gsub("USGS","Group",testnames)
 colnames(FinalAbsDf) <- testnames
-testnames <- testnames[-359]
+
+# not sure why it's getting rid of this specific instance
+# testnames <- testnames[-359]
+# get rid of NA columns
 testnames <- testnames[which(!testnames=="NA")]
 test <- data.frame(testnames,stringsAsFactors=FALSE)
 colnames(test) <- "GRnumber"
 wavs <- unique(FinalAbsDf$Wavelength)
 wavs <- wavs[which(wavs<=700)]
+
+# get rid of NA values 
+FinalAbsDf_test <- FinalAbsDf[,names(FinalAbsDf) != "NA"]
 library(USGSHydroOpt)
-testAbs <- getAbs(FinalAbsDf,"Wavelength",wavs,"Group",test,"GRnumber")
+testAbs <- getAbs(FinalAbsDf_test,"Wavelength",wavs,"Group",test,"GRnumber")
 finalcols <- colnames(FinalAbsDf)
 finalcols <- finalcols[which(substr(finalcols,1,2) %in% c("OU","Ou","CG","LK","OA","Wa"))]
 FinalAbsDf <- FinalAbsDf[,finalcols]
