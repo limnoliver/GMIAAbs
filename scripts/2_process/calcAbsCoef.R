@@ -28,3 +28,7 @@ testAbs <- getAbs(rawAbs,'Wavelength',wavs,"Group",test,"GRnumber")
 
 # write data to cached data fikder
 write.csv(testAbs, "cached_data/SummaryAbsCoef.csv", row.names = FALSE)
+
+###################################################
+
+
