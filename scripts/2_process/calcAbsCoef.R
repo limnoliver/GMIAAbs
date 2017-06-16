@@ -6,7 +6,7 @@ library(USGSHydroOpt)
 
 source("/scripts/getdata_aqualog.R")
 
-rawAbs <- read.csv("raw_data/absorbance/rawCompiledAbs.csv")
+rawAbs <- read.csv("raw_data/rawCompiledAbs.csv")
 
 #clean up column names
 testnames <- colnames(rawAbs)
