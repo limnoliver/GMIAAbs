@@ -2,20 +2,22 @@
 # appears to get rid of standards/blanks
 # this appears to be identifying samples of interest -- where columns
 # start with the identifiers "ou"...etc. Gets rid of blanks, 1%, ETC
-finalcols <- colnames(FinalAbsDf2)
+
+absraw <- read.csv("raw_data/rawCompiledAbs.csv")
+FinalAbsDf <- absraw
+finalcols <- colnames(absraw)
 finalcols <- finalcols[which(substr(finalcols,1,2) %in% c("OU","Ou","CG","LK","OA","Wa"))]
-FinalAbsDf2 <- FinalAbsDf2[,finalcols]
+FinalAbsDf <- FinalAbsDf[,finalcols]
 
-
-write.csv(testAbs,file="testAbs.csv")
-write.csv(FinalAbsDf,file="FinalAbsDf.csv")
-save(testAbs,file="testAbs.RData")
-save(FinalAbsDf,file="FinalAbsDf.RData")
 
 # saved above files 09/30/2015 - all correct except missing OAK S106 with file issue
+# note testAbs = SummaryAbsCoef.csv
 
-temp <- testAbs$GRnumber
-temp2 <- substr(testAbs$GRnumber,unlist(gregexpr(pattern="_2",temp))+1,unlist(gregexpr(pattern="_2",temp))+13)
+abscoef <- read.csv('cached_data/SummaryAbsCoef.csv', header = TRUE)
+
+# format text from column names to pull out date, time, project ID, etc
+temp <- as.character(abscoef$GRnumber)
+temp2 <- substr(abscoef$GRnumber,unlist(gregexpr(pattern="_2",temp))+1,unlist(gregexpr(pattern="_2",temp))+13)
 temp3 <- temp
 c <- grep("redo",temp)
 for (i in 1:length(temp)) {
@@ -25,56 +27,65 @@ for (i in 1:length(temp)) {
   if (i %in% c) {temp3[i] <- substr(temp3[i],1,nchar(temp3[i])-4)}
 }
 
-testAbs$date <- substr(temp2,nchar(temp2)-7,nchar(temp2))
-testAbs$ProjectID <- temp3
-testAbs$datetime <- strptime(testAbs$date,format="%Y%m%d")
+# extract date
+abscoef$date <- substr(temp2,nchar(temp2)-7,nchar(temp2))
+abscoef$datetime <- strptime(abscoef$date,format="%Y%m%d")
+
+# extract project ID
+abscoef$ProjectID <- temp3
+
 # reduce to sites of interest for GMIA
-testAbsGMIA <- testAbs[substr(testAbs$ProjectID,1,2) %in% c("OU","Ou","CG","LK","US","OA"),]
+abscoefGMIA <- abscoef[substr(abscoef$ProjectID,1,2) %in% c("OU","Ou","CG","LK","US","OA"),]
 # remove unneeded characters for ProjectID field
-testAbsGMIA$ProjectID <- gsub("-R","",testAbsGMIA$ProjectID)
+abscoefGMIA$ProjectID <- gsub("-R","",abscoefGMIA$ProjectID)
 
-testAbsOAK <- testAbs[grep("OAK-",testAbs$ProjectID),]
+abscoefOAK <- abscoef[grep("OAK",abscoef$ProjectID),]
 # remove duplicate sample for OAK site
-testAbsOAK <- testAbsOAK[which(paste(testAbsOAK$ProjectID,testAbsOAK$date,sep="")!="OAK-S10720140225"),]
+abscoefOAK <- abscoefOAK[which(paste(abscoefOAK$ProjectID,abscoefOAK$date,sep="")!="OAK-S10720140225"),]
 
-testAbsOUT <- testAbs[substr(testAbs$ProjectID,1,2) %in% c("OU","Ou"),]
-testAbsOUT <- testAbsOUT[-grep("-R",testAbsOUT$ProjectID),]
+abscoefOUT <- abscoef[substr(abscoef$ProjectID,1,2) %in% c("OU","Ou"),]
+abscoefOUT <- abscoefOUT[-grep(".R",abscoefOUT$ProjectID),]
 # remove duplicate samples for OUT site
-testAbsOUT <- testAbsOUT[which(paste(testAbsOUT$ProjectID,testAbsOUT$date,sep="")!="OUT-S10720140225"),]
-testAbsOUT <- testAbsOUT[which(paste(testAbsOUT$ProjectID,testAbsOUT$date,sep="")!="OUT-S107G20140225"),]
-testAbsOUT <- testAbsOUT[which(substr(testAbsOUT$GRnumber,1,18)!="OUT-S110G_Group003"),]
-testAbsOUT <- testAbsOUT[which(testAbsOUT$ProjectID!="OUT-S118-D"),]
-testAbsOUT <- testAbsOUT[which(substr(testAbsOUT$GRnumber,1,10)!="OUT-S114D_"),]
-testAbsOUT <- testAbsOUT[which(substr(testAbsOUT$GRnumber,1,10)!="OUT-S114E_"),]
-testAbsOUT <- testAbsOUT[which(substr(testAbsOUT$GRnumber,1,10)!="OUT-S114F_"),]
-testAbsOUT <- testAbsOUT[which(substr(testAbsOUT$GRnumber,1,10)!="OUT-S114G_"),]
-testAbsOUT <- testAbsOUT[which(substr(testAbsOUT$GRnumber,1,10)!="OUT-S114H_"),]
-testAbsOUT <- testAbsOUT[which(substr(testAbsOUT$GRnumber,1,10)!="OUT-S114J_"),]
-testAbsOUT <- testAbsOUT[which(substr(testAbsOUT$GRnumber,1,10)!="OUT-S114K_"),]
-testAbsOUT$ProjectID <- gsub('Out','OUT',testAbsOUT$ProjectID)
+abscoefOUT <- abscoefOUT[which(paste(abscoefOUT$ProjectID,abscoefOUT$date,sep="")!="OUT.S10720140225"),]
+abscoefOUT <- abscoefOUT[which(paste(abscoefOUT$ProjectID,abscoefOUT$date,sep="")!="OUT.S107G20140225"),]
+abscoefOUT <- abscoefOUT[which(substr(abscoefOUT$GRnumber,1,18)!="OUT.S110G_Group003"),]
+abscoefOUT <- abscoefOUT[which(abscoefOUT$ProjectID!="OUT.S118-D"),]
+abscoefOUT <- abscoefOUT[which(substr(abscoefOUT$GRnumber,1,10)!="OUT.S114D_"),]
+abscoefOUT <- abscoefOUT[which(substr(abscoefOUT$GRnumber,1,10)!="OUT.S114E_"),]
+abscoefOUT <- abscoefOUT[which(substr(abscoefOUT$GRnumber,1,10)!="OUT.S114F_"),]
+abscoefOUT <- abscoefOUT[which(substr(abscoefOUT$GRnumber,1,10)!="OUT.S114G_"),]
+abscoefOUT <- abscoefOUT[which(substr(abscoefOUT$GRnumber,1,10)!="OUT.S114H_"),]
+abscoefOUT <- abscoefOUT[which(substr(abscoefOUT$GRnumber,1,10)!="OUT.S114J_"),]
+abscoefOUT <- abscoefOUT[which(substr(abscoefOUT$GRnumber,1,10)!="OUT.S114K_"),]
+abscoefOUT$ProjectID <- gsub('Out','OUT',abscoefOUT$ProjectID)
 
-testAbsCG <- testAbs[grep("CG-",testAbs$ProjectID),]
+abscoefCG <- abscoef[grep("CG.",abscoef$ProjectID),]
 # remove duplicate and QC samples for CG site
-testAbsCG <- testAbsCG[which(paste(testAbsCG$ProjectID,testAbsCG$date,sep="")!="CG-S10720140225"),]
-testAbsCG <- testAbsCG[which(testAbsCG$ProjectID!="CG-S116B"),]
-testAbsCG <- testAbsCG[which(testAbsCG$ProjectID!="CG-Q23C"),]
+abscoefCG <- abscoefCG[which(paste(abscoefCG$ProjectID,abscoefCG$date,sep="")!="CG.S10720140225"),]
+abscoefCG <- abscoefCG[which(abscoefCG$ProjectID!="CG.S116B"),]
+abscoefCG <- abscoefCG[which(abscoefCG$ProjectID!="CG.Q23C"),]
 
-testAbsLK <- testAbs[grep("LK-",testAbs$ProjectID),]
+abscoefLK <- abscoef[grep("LK.",abscoef$ProjectID),]
 # remove duplicate and QC samples for LK site
-testAbsLK <- testAbsLK[which(testAbsLK$ProjectID!="LK-Q23C"),]
-testAbsLK <- testAbsLK[-grep("-R",testAbsLK$ProjectID),]
-testAbsLK <- testAbsLK[which(paste(testAbsLK$ProjectID,testAbsLK$date,sep="")!="LK-S10720140225"),]
-testAbsLK <- testAbsLK[which(paste(testAbsLK$ProjectID,testAbsLK$date,sep="")!="LK-S107G20140225"),]
 
-testAbsWorking <- rbind(testAbsOUT,testAbsCG)
-testAbsWorking <- rbind(testAbsWorking,testAbsLK)
-testAbsWorking <- rbind(testAbsWorking,testAbsOAK)
+#############
+# Fix? Not sure this part is doing what it's supposed to
+############
+abscoefLK <- abscoefLK[which(abscoefLK$ProjectID!="LK.Q23C"),]
+abscoefLK <- abscoefLK[-grep(".R",abscoefLK$ProjectID),]
+abscoefLK <- abscoefLK[which(paste(abscoefLK$ProjectID,abscoefLK$date,sep="")!="LK.S10720140225"),]
+abscoefLK <- abscoefLK[which(paste(abscoefLK$ProjectID,abscoefLK$date,sep="")!="LK.S107G20140225"),]
+
+abscoefWorking <- rbind(abscoefOUT,abscoefCG)
+abscoefWorking <- rbind(abscoefWorking,abscoefLK)
+abscoefWorking <- rbind(abscoefWorking,abscoefOAK)
 # after merging sites of interest, remove any remaining QC samples
-testAbsWorking <- testAbsWorking[-which(substr(testAbsWorking$GRnumber,1,1)=='Q'),]
+abscoefWorking <- abscoefWorking[-which(substr(abscoefWorking$GRnumber,1,1)=='Q'),]
 # limit samples to Nov-April deicing period
-testAbsWorking <- testAbsWorking[-which(testAbsWorking$ProjectID %in% c("OUT-S110","OUT-S110G","OUT-S117","OUT-S118","CG-S110","CG-S117","CG-S118","LK-S110","LK-S110G","LK-S117","LK-S118","OAK-S110","OAK-S118")),]
+abscoefWorking <- abscoefWorking[-which(abscoefWorking$ProjectID %in% c("OUT.S110","OUT.S110G","OUT.S117","OUT.S118","CG.S110","CG.S117","CG.S118","LK.S110","LK.S110G","LK.S117","LK.S118","OAK.S110","OAK.S118")),]
 
-grnumsIn <- unique(testAbsWorking$GRnumber)
+grnumsIn <- unique(abscoefWorking$GRnumber)
+grnumsIn <- as.character(grnumsIn)
 grnumsIn <- c(grnumsIn,"Wavelength")
 FinalAbsDf <- FinalAbsDf[,grnumsIn]
 finalcols <- colnames(FinalAbsDf)
@@ -84,6 +95,7 @@ finalcolsCG <- finalcols[which(substr(finalcols,1,2) %in% c("CG"))]
 finalcolsLK <- finalcols[which(substr(finalcols,1,2) %in% c("LK"))]
 finalcolsOA <- finalcols[which(substr(finalcols,1,2) %in% c("OA"))]
 finalcolsALL <- finalcols[which(substr(finalcols,1,2) %in% c("OU","Ou","CG","LK","OA"))]
+
 FinalAbsDf$meanAbs <- rowMeans(FinalAbsDf[,finalcolsALL])
 FinalAbsDf$meanAbsOUT <- rowMeans(FinalAbsDf[,finalcolsOUT])
 FinalAbsDf$meanAbsCG <- rowMeans(FinalAbsDf[,finalcolsCG])
