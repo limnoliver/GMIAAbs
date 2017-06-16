@@ -7,4 +7,4 @@ FinalAbsDf <- formatAbsSamplesRevised(dateLower='20130930',dateUpper='20170113',
 # remove columns with NA names
 FinalAbsDf2 <- FinalAbsDf[,names(FinalAbsDf) != "NA"]
 
-write.csv(FinalAbsDf2, "raw_data/absorbance/rawCompiledAbs.csv", row.names = FALSE)
+write.csv(FinalAbsDf2, "raw_data/rawCompiledAbs.csv", row.names = FALSE)
