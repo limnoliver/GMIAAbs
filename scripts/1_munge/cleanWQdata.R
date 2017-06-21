@@ -1,10 +1,13 @@
-# filter wq data
+# this script filters and cleans wq data
+# for eventual merging with absorbance data
+
+wq_data <- read.csv('raw_data/rawWQdata.csv')
 
 # keep only rows that have a project ID
 wq_filtered <- wq_data %>%
   filter(!is.na(ProjectID))
 
-# format ProjectID to look like the GMIASag$ProjectID
+# format ProjectID to look like project ID from absSlope.csv
 wq_filtered$ProjectID <- gsub('-', '.', wq_filtered$ProjectID)
 
 # filter which WQ variables are of interest
@@ -34,3 +37,5 @@ new.names <- gsub("\\s", "_", new.names)
 
 # rename columns in wq dataframe
 names(wq_filtered) <- new.names
+
+write.csv(wq_filtered, "cached_data/cleanedWQdata.csv", row.names = FALSE)
