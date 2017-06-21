@@ -105,6 +105,8 @@ formatAbsSamplesRevised <- function(dateLower,dateUpper,Type,Project){
         DescriptionFile$ActivityEndDate <- as.character(format(DescriptionFile$ActivityEndDate, "%D"))
       }
       DescriptionFile <- as.data.frame(DescriptionFile)
+      start.col <- grep("field", names(DescriptionFile), ignore.case = TRUE)
+      DescriptionFile <- DescriptionFile[,c(start.col:length(DescriptionFile))]
      
       }
     
@@ -112,7 +114,7 @@ formatAbsSamplesRevised <- function(dateLower,dateUpper,Type,Project){
         DescriptionFile <- DescriptionFile
       }else{
         DescriptionFile <- DescriptionFile[which(DescriptionFile[,9]==Project),]
-        if(length(which(DescriptionFile[,9]==Project))<1) next}
+        if(length(which(DescriptionFile[,col.num]==Project))<1) next}
       
       if(Type =='Environmental Samples'){
         exclude <- grep('lank',DescriptionFile[,1],ignore.case = TRUE)
