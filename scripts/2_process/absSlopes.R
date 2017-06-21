@@ -1,12 +1,17 @@
 # script that uses output from absResiduals, and adds spectral slopes
+# read in dataframe that has residuals calculated
+# import processed data
+absResiduals <- read.csv('cached_data/absResiduals.csv')
+FinalAbsDf <- read.csv("cached_data/SummarizedAbsData.csv")
 
-# calculate slopes for selected absorbence values
-sag <- read.csv("SagVals.csv",stringsAsFactors=FALSE)
+# read in selected absorbence values
+sag <- read.csv("raw_data/SagVals.csv",stringsAsFactors=FALSE)
+
+waveCol <- "Wavelength"
 colSubsetString <- "Gr"
-dataSummary <- testdfOpt3
+dataSummary <-  absResiduals
 grnum <- "GRnumber"
-source("/Users/jlthomps/Desktop/git/GMIA/getSagJT.R")
-GMIASag <- getSagJT(FinalAbsDf,waveCol,sag,colSubsetString,dataSummary,"GRnumber")
 
-save(GMIASag,file="GMIASagFinal.RData")
-# file saved 10/7/15
+GMIASag <- getSag(FinalAbsDf,waveCol,sag,colSubsetString,dataSummary,"GRnumber")
+
+write.csv(GMIASag, "cached_data/absSlopesResiduals.csv", row.names = FALSE)
