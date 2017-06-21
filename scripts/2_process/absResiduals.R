@@ -38,5 +38,5 @@ testdfOpt3 <- getExpResid(wavelength,rangeReg,rangeGap,dataAbs,waveCol,colSubset
 names(testdfOpt3)[length(testdfOpt3)] <- "Resids422"
 
 #write data
-write.csv(testdfOpt3, 'cached_data/absResiduals.csv')
+write.csv(testdfOpt3, 'cached_data/absResiduals.csv', row.names = FALSE)
 
