@@ -1,5 +1,5 @@
-
-pdf("AbsQuickLook.pdf")
+FinalAbsDf <- read.csv('cached_data/SummarizedAbsData.csv')
+pdf("figures/AbsQuickLook.pdf")
 par(mfrow=c(4,3), oma = c(1,1,1,1), mar = c(2,2,0,0))
 for (i in 1:(length(FinalAbsDf)-7)){
   plotAbs(FinalAbsDf, WaveCol = "Wavelength", absCol = names(FinalAbsDf[i]))
