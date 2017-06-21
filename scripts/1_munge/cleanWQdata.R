@@ -3,6 +3,9 @@
 
 wq_data <- read.csv('raw_data/rawWQdata.csv')
 
+# project ID is hidden in unnamed column "X__1"
+names(wq_data)[151] <- 'ProjectID'
+
 # keep only rows that have a project ID
 wq_filtered <- wq_data %>%
   filter(!is.na(ProjectID))
