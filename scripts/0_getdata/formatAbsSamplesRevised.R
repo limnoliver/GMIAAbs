@@ -41,7 +41,7 @@ formatAbsSamplesRevised <- function(dateLower,dateUpper,Type,Project){
   dateRangeFilese <- dateRangeFilese[which(nchar(dateRangeFilese)<10)]
   dateRangeFilese <- paste('2016/',dateRangeFilese,sep="")
   
-  dateRangeFilesf <- list.files(path='//igsarmewwshg9/HG9Data/AquaLog/AquaLog_Data/2017')
+  dateRangeFilesf <- list.files(path='//igsarmewwshg8/HG8Data/Aqualog/AquaLog_Data/2017')
   dateRangeFilesf <- dateRangeFilesf[which(dateRangeFilesf <= dateUpper)]
   dateRangeFilesf <- dateRangeFilesf[which(dateRangeFilesf >= dateLower)]
   dateRangeFilesf <- dateRangeFilesf[which(nchar(dateRangeFilesf)<10)]
@@ -64,10 +64,13 @@ formatAbsSamplesRevised <- function(dateLower,dateUpper,Type,Project){
   
 
   for(i in 1:length(dateRangeFiles)){
-    
+    if (length(grep("2017/", dateRangeFiles[i])) == 1) {
+      fileName <- paste('//igsarmewwshg8/HG8Data/Aqualog/AquaLog_Data',dateRangeFiles[i],sep='/')
+      cat(paste(i,fileName,'\n',sep="\n"))
+    } else {
     fileName <- paste('//igsarmewwshg9/HG9Data/AquaLog/AquaLog_Data',dateRangeFiles[i],sep='/')
     cat(paste(i,fileName,'\n',sep="\n"))
-    
+    }
     setwd(fileName)
     
     allFiles <- list.files(path='.')
