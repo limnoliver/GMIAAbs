@@ -76,7 +76,7 @@ abscoefWorking <- abscoefWorking[-which(substr(abscoefWorking$GRnumber,1,1)=='Q'
 # limit samples to Nov-April deicing period
 abscoefWorking <- abscoefWorking[-which(abscoefWorking$ProjectID %in% c("OUT.S110","OUT.S110G","OUT.S117","OUT.S118","CG.S110","CG.S117","CG.S118","LK.S110","LK.S110G","LK.S117","LK.S118","OAK.S110","OAK.S118")),]
 
-write.csv(abscoefWorking,'cached_data/AbsData.csv')
+write.csv(abscoefWorking,'cached_data/AbsData.csv', row.names = FALSE)
 
 grnumsIn <- unique(abscoefWorking$GRnumber)
 grnumsIn <- as.character(grnumsIn)
