@@ -1,5 +1,5 @@
 library(USGSHydroOpt)
-
+source('/scripts/2_process/calcAbsCoef.R')
 FinalAbsDf <- read.csv("raw_data/rawCompiledAbs.csv", header = TRUE)
 abscoef <- read.csv('cached_data/SummaryAbsCoef.csv', header = TRUE)
 

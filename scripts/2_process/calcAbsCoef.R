@@ -4,7 +4,7 @@
 # saves summarized data
 library(USGSHydroOpt)
 
-source("/scripts/getdata_aqualog.R")
+source("/scripts/0_getdata/getdata_aqualog.R")
 
 rawAbs <- read.csv("raw_data/rawCompiledAbs.csv")
 
