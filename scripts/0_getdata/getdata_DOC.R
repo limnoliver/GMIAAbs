@@ -1,7 +1,6 @@
 library(readxl)
-
-years = c(2014:2017)
-filePath <- 
+library(dplyr)
+years = c(2013:2016)
 
 # i = years
 # j = files (dates) within year folders
@@ -16,9 +15,10 @@ for (i in 1:length(years)){
   files <- files[grep('.xlsx', files)]
   files <- files[grep('^\\d{6,}', files)]
   
-  temp.df <- data.frame(ProjectID <- as.character(), 
-                        DOC <- as.numeric(),
-                        DOC_processed <- as.logical())
+  temp.df <- tibble(ProjectID = as.character(), 
+                        DOC = as.numeric(),
+                        DOC_dilution_corrected = as.logical(),
+                        Date = as.character())
   
   for (j in 1:length(files)){
     # read in file - need to consider that the sheet we're interested
@@ -32,16 +32,16 @@ for (i in 1:length(years)){
     # not sure if this means that FALSE means that this info needs to be corrected,
     # or that files were not diluted. Check with Pete/Mari on this front
     if (length(grep('final', names(temp), ignore.case = TRUE))==0){
-      temp$DOC <- temp[,grep('mean', names(temp), ignore.case = TRUE)]
+      temp$DOC <- as.numeric(unlist(temp[,grep('mean', names(temp), ignore.case = TRUE)]))
       temp$DOC_dilution_corrected <- FALSE
     } else {
-      temp$DOC <- temp[,grep('final', names(temp), ignore.case = TRUE)]
+      temp$DOC <- as.numeric(unlist(temp[,grep('final', names(temp), ignore.case = TRUE)]))
       temp$DOC_dilution_corrected <- TRUE
     }
-    temp.df <- rbind(temp.df, temp[,c(names(temp)[grep('sample', names(temp), ignore.case = TRUE)], 'DOC', 'DOC_dilution_corrected')])
-    
-    
-    
+    names(temp)[grep('sample', names(temp), ignore.case = TRUE)] <- "ProjectID"
+    temp$Date <- gsub('(\\d{6,})(.xlsx)', '\\1', files[j])
+    temp <- temp[,c('ProjectID', 'DOC', 'DOC_dilution_corrected', 'Date')]
+    temp.df <- bind_rows(temp.df, temp)
   }
-  
+  doc.data[[i]] <- temp.df
 }
