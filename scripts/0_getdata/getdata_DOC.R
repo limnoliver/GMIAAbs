@@ -50,5 +50,5 @@ for (i in 1:length(years)){
 doc.data <- bind_rows(doc.data)
 
 # save data frame
-write.csv(doc.data, 'raw_data/rawDOCdata.csv')
+write.csv(doc.data, 'raw_data/rawDOCdata.csv', row.names = FALSE)
 
