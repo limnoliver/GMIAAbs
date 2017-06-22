@@ -45,3 +45,10 @@ for (i in 1:length(years)){
   }
   doc.data[[i]] <- temp.df
 }
+# now combine all year dataframes (currently in list in doc.data)
+# to one data frame
+doc.data <- bind_rows(doc.data)
+
+# save data frame
+write.csv(doc.data, 'raw_data/rawDOCdata.csv')
+
