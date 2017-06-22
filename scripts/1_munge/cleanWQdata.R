@@ -1,7 +1,7 @@
 # this script filters and cleans wq data
 # for eventual merging with absorbance data
-
-wq_data <- read.csv('raw_data/rawWQdata.csv')
+library(dplyr)
+wq_data <- read.csv('raw_data/rawWQdata.csv', check.names = FALSE)
 
 # project ID is hidden in unnamed column "X__1"
 names(wq_data)[151] <- 'ProjectID'
@@ -15,7 +15,7 @@ wq_filtered$ProjectID <- gsub('-', '.', wq_filtered$ProjectID)
 
 # filter which WQ variables are of interest
 
-vars.keep <- grep("cod,|bod|formate|acetate|glycol|calcium|magnesium|potassium|sodium|NH3|ammonia|NO2|ethylene|propylene|methyl", names(wq_filtered), ignore.case = TRUE)
+vars.keep <- grep("cod,|bod|formate|acetate|glycol|potassium|sodium|ethylene|propylene|methyl", names(wq_filtered), ignore.case = TRUE)
 vars.keep <- c(vars.keep, vars.keep-1)
 vars.keep <- sort(vars.keep)
 
