@@ -13,7 +13,7 @@ for (i in 1:length(years)){
   FilePath <- paste('//Igsarmewwsscu/SCUData/TOC_REPORTS/GMIA_Corsi-Lenaker',years[i],sep='/')
   files <- list.files(FilePath)
   files <- files[grep('.xlsx', files)]
-  files <- files[grep('^\\d{6,}', files)]
+  files <- files[grep('^\\d{5,}', files)]
   
   temp.df <- tibble(ProjectID = as.character(), 
                         DOC = as.numeric(),
@@ -39,7 +39,7 @@ for (i in 1:length(years)){
       temp$DOC_dilution_corrected <- TRUE
     }
     names(temp)[grep('sample', names(temp), ignore.case = TRUE)] <- "ProjectID"
-    temp$Date <- gsub('(\\d{6,})(.xlsx)', '\\1', files[j])
+    temp$Date <- gsub('(\\d{5,}.)(\\.xlsx)', '\\1', files[j])
     temp <- temp[,c('ProjectID', 'DOC', 'DOC_dilution_corrected', 'Date')]
     temp.df <- bind_rows(temp.df, temp)
   }
