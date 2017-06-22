@@ -40,4 +40,32 @@ for (i in 1:nrow(doc.unique2)){
   }
 }
 
-# 3) now find duplicated ProjectIDs that have different dates
+# 3) now find duplicated ProjectIDs that have different date,
+# use latest date
+
+# first, have to format dates properly
+new.dates <- c()
+for (i in 1:length(doc.unique2$Date)){
+  if (nchar(as.character(doc.unique2$Date[i])) == 8 &
+      length(grep('^201', doc.unique2$Date[i])) == 1){
+    new.dates[i] <- as.character(doc.unique2$Date[i])
+  } else if (nchar(as.character(doc.unique2$Date[i])) == 8 &
+             length(grep('^201', doc.unique2$Date[i])) == 0) {
+    new.dates[i] <- paste(substr(as.character(doc.unique2$Date[i]), 5, 8), 
+                          substr(as.character(doc.unique2$Date[i]), 0, 2), 
+                          substr(as.character(doc.unique2$Date[i]), 3, 4), sep = "")
+    
+  } else if (nchar(as.character(doc.unique2$Date[i])) == 6) {
+    new.dates[i] <- paste('20', substr(as.character(doc.unique2$Date[i]), 5, 6), 
+                          substr(as.character(doc.unique2$Date[i]), 0, 2), 
+                          substr(as.character(doc.unique2$Date[i]), 3, 4), sep = "")
+  } else if (nchar(as.character(doc.unique2$Date[i])) == 9) {
+    new.dates[i] <- gsub('(\\d{8})(.)', '\\1', doc.unique2$Date[i])
+  }
+}   
+
+doc.unique3 <- data.frame(ProjectID = unique(doc.unique2$ProjectID),
+                          DOC = "",
+                          DOC_dilution_corrected = "",
+                          Date = "",
+                          NewNames = "")
