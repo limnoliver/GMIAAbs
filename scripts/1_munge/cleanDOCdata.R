@@ -62,10 +62,20 @@ for (i in 1:length(doc.unique2$Date)){
   } else if (nchar(as.character(doc.unique2$Date[i])) == 9) {
     new.dates[i] <- gsub('(\\d{8})(.)', '\\1', doc.unique2$Date[i])
   }
-}   
+} 
 
-doc.unique3 <- data.frame(ProjectID = unique(doc.unique2$ProjectID),
+doc.unique2$Date_formatted <- new.dates
+
+# now find which date should be used for each sample
+counts <- table(doc.unique2$ProjectID)
+doc.unique3 <- data.frame(ProjectID = row.names(counts),
+                          nsamples = as.numeric(counts),
                           DOC = "",
-                          DOC_dilution_corrected = "",
-                          Date = "",
-                          NewNames = "")
+                          DOC_dilution_corrected = "", 
+                          Date = "", 
+                          Date_formatted = "")
+doc.unique3 <- doc.unique3[doc.unique3$nsamples != 0, ]
+                          
+for (i in 1:nrow(doc.unique3)) {
+  
+}
