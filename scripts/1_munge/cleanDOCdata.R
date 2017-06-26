@@ -2,6 +2,10 @@
 
 doc.raw <- read.csv('raw_data/rawDOCdata.csv')
 
+# get sample ids from absorbance data to ID samples we want to keep
+sample.ids <- read.csv('cached_data/absSlopesResiduals.csv')
+sample.ids <- sample.ids$ProjectID
+
 # identify QA rows from 'ProjectID' column
 # these include blanks and standards
 rows.exclude <- grep('blank*|ppm|unknown|standard*|std|dilution', doc.raw$ProjectID, ignore.case = TRUE)
@@ -43,6 +47,11 @@ for (i in 1:nrow(doc.unique2)){
 # 3) now find duplicated ProjectIDs that have different date,
 # use latest date
 
+# to avoid processing samples that we won't keep,
+# get rid of rows that do not have a project ID that is shared by absorbance data
+doc.unique2$ProjectID <- gsub("-", ".", doc.unique2$ProjectID)
+dat.keep <- which(doc.unique2$ProjectID %in% sample.ids)
+doc.unique2 <- doc.unique2[dat.keep, ]
 # first, have to format dates properly
 new.dates <- c()
 for (i in 1:length(doc.unique2$Date)){
@@ -77,5 +86,33 @@ doc.unique3 <- data.frame(ProjectID = row.names(counts),
 doc.unique3 <- doc.unique3[doc.unique3$nsamples != 0, ]
                           
 for (i in 1:nrow(doc.unique3)) {
-  
+ if (doc.unique3$nsamples[i] > 1) {
+   temp <- doc.unique2[doc.unique2$ProjectID == doc.unique3$ProjectID[i], ]
+   temp <- temp[which(temp$Date %in% max(as.numeric(as.character(temp$Date)))), ]
+   if (nrow(temp) > 1){
+     doc.unique3$ProjectID[i] <- temp$ProjectID[1]
+     doc.unique3$DOC[i] <- mean(temp$DOC)
+     doc.unique3$Date <- paste('multiple readings for this sample in file', temp$Date[1], sep = " ")
+     doc.unique3$Date_formatted <- paste('multiple readings for this sample on date',temp$Date_formatted[1], sep  = " ")
+     ifelse(temp$DOC_dilution_corrected)
+     if (all(temp$DOC_dilution_corrected)) {
+       doc.unique3$DOC_dilution_corrected[i] <- TRUE
+     } else {
+       doc.unique3$DOC_dilution_corrected[i] <- FALSE
+     }
+   }
+ } 
 }
+
+# export sample IDS and file name of places where there are duplicate samples for each ProjectID
+
+multiple.entries <- doc.unique3[doc.unique3$nsamples > 1, ] 
+multiple.entries <- multiple.entries[,c(1,2,5)]
+multiple.entries$Date <- as.character(multiple.entries$Date)
+for (i in 1:nrow(multiple.entries)) {
+    temp <- doc.unique2[doc.unique2$ProjectID == multiple.entries$ProjectID[i], ]
+    multiple.entries$Date[i] <-  paste(temp$Date, collapse = ", ")
+}
+
+write.csv(multiple.entries, "DOC_duplicate_entries.csv", row.names = FALSE)
+  
