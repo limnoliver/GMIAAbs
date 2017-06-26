@@ -20,29 +20,20 @@ doc.cleaned <- doc.cleaned[!is.na(doc.cleaned$ProjectID), ]
 # several reasons why a sample ID might be repeated
 # 1) machine replicates that measure the same aliquot of water, and the means of these are exported for
 # every sample ID - sample ID exactly the same. SOLUTION: take one of the values, or mean (same answer)
-# 2) field replicates where two aliquots were collected at same site/time, 
-# these have "-rep" or "-REP" added to the end. SOLUTION: take mean
+# 2) analytical replicates
+# these have "-rep" or "-REP" added to the end. SOLUTION: drop values -- will use later for QA
 # 3) sample reruns - where same water was run on a later date due to measurement errors/issues,
 # these are likely to have same sample id but different date. SOLUTION: take lastest measurement, or 
-# sample from file with latest date field
+# sample from file with latest date field -- Pete noted this won't always be the case, so will likely
+# have to find case-by-case solution. 
 
 # 1) get rid of rows that are exactly the same across all columns
 doc.unique <- unique(doc.cleaned)
 
-# 2) identify field replicates and take mean of sample + rep
+# 2) identify field replicates and drop them
 reps <- grep('rep|-R', doc.unique$ProjectID, ignore.case = TRUE)
-rep.names <- doc.unique$ProjectID[grep('rep|-R', doc.unique$ProjectID, ignore.case = TRUE)]
-new.names <- gsub('\\(rep\\)|-REP|-R', "", rep.names, ignore.case = FALSE)
-
-doc.reps <- doc.unique[reps,]
-doc.reps$NewNames <- new.names
 doc.unique2 <- doc.unique[-reps, ]
 
-for (i in 1:nrow(doc.unique2)){
-  if (doc.unique2$ProjectID[i] %in% new.names) {
-    doc.unique2$DOC[i] <- mean(doc.unique2$DOC[i], doc.reps$DOC[which(doc.reps$NewNames %in% doc.unique2$ProjectID[i])])
-  }
-}
 
 # 3) now find duplicated ProjectIDs that have different date,
 # use latest date
