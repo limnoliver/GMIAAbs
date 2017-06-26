@@ -99,15 +99,4 @@ for (i in 1:nrow(doc.unique3)) {
  }
 }
  
-# export sample IDS and file name of places where there are duplicate samples for each ProjectID
-
-multiple.entries <- doc.unique3[doc.unique3$nsamples > 1, ] 
-multiple.entries <- multiple.entries[,c(1,2,5)]
-multiple.entries$Date <- as.character(multiple.entries$Date)
-for (i in 1:nrow(multiple.entries)) {
-    temp <- doc.unique2[doc.unique2$ProjectID == multiple.entries$ProjectID[i], ]
-    multiple.entries$Date[i] <-  paste(temp$Date, collapse = ", ")
-}
-
-write.csv(multiple.entries, "DOC_duplicate_entries.csv", row.names = FALSE)
-  
+write.csv(doc.unique3, 'cached_data/cleanedDOCdata.csv', row.names = FALSE)
