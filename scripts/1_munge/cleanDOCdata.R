@@ -70,31 +70,35 @@ doc.unique2$Date_formatted <- new.dates
 counts <- table(doc.unique2$ProjectID)
 doc.unique3 <- data.frame(ProjectID = row.names(counts),
                           nsamples = as.numeric(counts),
-                          DOC = "",
-                          DOC_dilution_corrected = "", 
-                          Date = "", 
-                          Date_formatted = "")
+                          DOC = NA,
+                          DOC_dilution_corrected = NA, 
+                          Date = NA, 
+                          Date_formatted = NA)
 doc.unique3 <- doc.unique3[doc.unique3$nsamples != 0, ]
-                          
+
+# if there are multiple observations in the same date, take the mean
+# if there are multiple observations across multiple dates, take the latest observation
+# this may not be completely correct - Pete will verify based on file list I gave him. 
 for (i in 1:nrow(doc.unique3)) {
  if (doc.unique3$nsamples[i] > 1) {
    temp <- doc.unique2[doc.unique2$ProjectID == doc.unique3$ProjectID[i], ]
-   temp <- temp[which(temp$Date %in% max(as.numeric(as.character(temp$Date)))), ]
+   temp <- temp[which(temp$Date_formatted %in% max(as.numeric(as.character(temp$Date_formatted)))), ]
    if (nrow(temp) > 1){
      doc.unique3$ProjectID[i] <- temp$ProjectID[1]
      doc.unique3$DOC[i] <- mean(temp$DOC)
-     doc.unique3$Date <- paste('multiple readings for this sample in file', temp$Date[1], sep = " ")
-     doc.unique3$Date_formatted <- paste('multiple readings for this sample on date',temp$Date_formatted[1], sep  = " ")
-     ifelse(temp$DOC_dilution_corrected)
-     if (all(temp$DOC_dilution_corrected)) {
-       doc.unique3$DOC_dilution_corrected[i] <- TRUE
-     } else {
-       doc.unique3$DOC_dilution_corrected[i] <- FALSE
-     }
-   }
- } 
-}
+     doc.unique3$Date[i] <- paste('multiple readings for this sample in file', temp$Date[1], sep = " ")
+     doc.unique3$Date_formatted[i] <- paste('multiple readings for this sample on date', temp$Date_formatted[1], sep  = " ")
+     doc.unique3$DOC_dilution_corrected[i] <- temp$DOC_dilution_corrected[1]
 
+     } else {
+       doc.unique3[i,c(1,3,4,5,6)] <- temp[1,]
+     }
+ } else {
+   temp <- doc.unique2[doc.unique2$ProjectID == doc.unique3$ProjectID[i], ]
+   doc.unique3[i,c(1,3,4,5,6)] <- temp[1,]
+ }
+}
+ 
 # export sample IDS and file name of places where there are duplicate samples for each ProjectID
 
 multiple.entries <- doc.unique3[doc.unique3$nsamples > 1, ] 
