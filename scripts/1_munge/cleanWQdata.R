@@ -41,4 +41,15 @@ new.names <- gsub("\\s", "_", new.names)
 # rename columns in wq dataframe
 names(wq_filtered) <- new.names
 
+# rename a set of 2015 files that have "COD-" ProjectIDs rather than the storm event/location name
+# OUT-S113 through S115 were collected in glass bottles in the COD sampler, not regular sampler
+
+missing.dat <- read.csv('cached_data/missingWQdata.csv')
+missing.dat <- missing.dat[missing.dat$Sample.ID..notes == 'COD results exists', ]
+sample.no <- missing.dat$record.no
+replacement.projectid <- missing.dat$ProjectID
+
+replace.rows <- which(wq_filtered$Record_number %in% sample.no)
+wq_filtered$ProjectID[replace.rows] <- as.character(replacement.projectid)
+
 write.csv(wq_filtered, "cached_data/cleanedWQdata.csv", row.names = FALSE)
