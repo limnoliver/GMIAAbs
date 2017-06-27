@@ -2,16 +2,16 @@ GMIA absorbance/dyes task
 
 1. Gather data
  -Aqualog [Sam completed import of newer data - revised formatAbsSamplesRevised to work with new data, updated to now use new file location]
- -W.Q. data
- -DOC data
+ -W.Q. data [still sorting out missing COD values]
+ -DOC data [still sorting out duplicate observations and 2017 data with Pete]
  
 2. Process data
- -Extract needed absorbance data
+ -Extract needed absorbance data [done, needs QA]
 
 3. Merge data
- -W.Q. + Aualog + DOC
+ -W.Q. + Aualog + DOC [done]
  -Double check that all data is present
-   -If there is Aqualog data, there should be W.Q. and DOC data.
+   -If there is Aqualog data, there should be W.Q. and DOC data. [some missing COD data -- appears to be because of sample naming convention]
    -There will be W.Q. data when there is not associated Aqualog and DOC data
 
 
