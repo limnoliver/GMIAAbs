@@ -48,6 +48,7 @@ missing.dat <- read.csv('cached_data/missingWQdata.csv')
 missing.dat <- missing.dat[missing.dat$Sample.ID..notes == 'COD results exists', ]
 sample.no <- missing.dat$record.no
 replacement.projectid <- missing.dat$ProjectID
+replacement.projectid <- gsub("-", ".", replacement.projectid)
 
 replace.rows <- which(wq_filtered$Record_number %in% sample.no)
 wq_filtered$ProjectID[replace.rows] <- as.character(replacement.projectid)
