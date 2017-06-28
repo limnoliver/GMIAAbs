@@ -1,6 +1,6 @@
 library(readxl)
 library(dplyr)
-years = c(2013:2016)
+years = c(2013:2017)
 
 # i = years
 # j = files (dates) within year folders
@@ -18,7 +18,8 @@ for (i in 1:length(years)){
   temp.df <- tibble(ProjectID = as.character(), 
                         DOC = as.numeric(),
                         DOC_dilution_corrected = as.logical(),
-                        Date = as.character())
+                        Date = as.character(), 
+                        Keep = as.integer())
   
   for (j in 1:length(files)){
     # read in file - need to consider that the sheet we're interested
@@ -27,10 +28,9 @@ for (i in 1:length(years)){
     if (length(grep('sample', names(temp)[1], ignore.case= TRUE)) == 0){
       temp <- read_xlsx(paste(FilePath, files[j], sep = "/"), sheet = 2)
     }
-    # find out whether the file has been post-processed
-    # which means that manual diluation was accounted for
-    # not sure if this means that FALSE means that this info needs to be corrected,
-    # or that files were not diluted. Check with Pete/Mari on this front
+    # prior to 2017, use log to find which files should be used for which ProjectID
+    # 2017 and on, use the column "samplekeep" to define whether each observation should be 
+    # used or not. This should solve "rerun" duplicate samples.
     if (length(grep('final', names(temp), ignore.case = TRUE))==0){
       temp$DOC <- as.numeric(unlist(temp[,grep('mean', names(temp), ignore.case = TRUE)]))
       temp$DOC_dilution_corrected <- FALSE
@@ -38,10 +38,18 @@ for (i in 1:length(years)){
       temp$DOC <- as.numeric(unlist(temp[,grep('final', names(temp), ignore.case = TRUE)]))
       temp$DOC_dilution_corrected <- TRUE
     }
+    if (years[i]>2016){
+      names(temp)[grep('keep', names(temp), ignore.case = TRUE)] <- 'Keep'
+    } else {
+      temp$Keep <- NA
+    }
     names(temp)[grep('sample', names(temp), ignore.case = TRUE)] <- "ProjectID"
     temp$Date <- gsub('(\\d{5,}.)(\\.xlsx)', '\\1', files[j])
-    temp <- temp[,c('ProjectID', 'DOC', 'DOC_dilution_corrected', 'Date')]
+    
+    temp <- temp[,c('ProjectID', 'DOC', 'DOC_dilution_corrected', 'Date', 'Keep')]
+   
     temp.df <- bind_rows(temp.df, temp)
+    
   }
   doc.data[[i]] <- temp.df
 }
