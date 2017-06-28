@@ -66,37 +66,25 @@ for (i in 1:length(doc.unique2$Date)){
 
 doc.unique2$Date_formatted <- new.dates
 
-# now find which date should be used for each sample
-counts <- table(doc.unique2$ProjectID)
-doc.unique3 <- data.frame(ProjectID = row.names(counts),
-                          nsamples = as.numeric(counts),
-                          DOC = NA,
-                          DOC_dilution_corrected = NA, 
-                          Date = NA, 
-                          Date_formatted = NA)
-doc.unique3 <- doc.unique3[doc.unique3$nsamples != 0, ]
+sample.log <- read_xlsx('M:/NonPoint Evaluation/gmia/SLOH labforms and budget/optics.sample.log.ALL.xlsx')
+sample.log <- as.data.frame(sample.log[,c(2,6)])
+names(sample.log) <- c('ProjectID', 'KeepDate')
+sample.log$ProjectID <- gsub("-", ".", sample.log$ProjectID)
 
-# if there are multiple observations in the same date, take the mean
-# if there are multiple observations across multiple dates, take the latest observation
-# this may not be completely correct - Pete will verify based on file list I gave him. 
-for (i in 1:nrow(doc.unique3)) {
- if (doc.unique3$nsamples[i] > 1) {
-   temp <- doc.unique2[doc.unique2$ProjectID == doc.unique3$ProjectID[i], ]
-   temp <- temp[which(temp$Date_formatted %in% max(as.numeric(as.character(temp$Date_formatted)))), ]
-   if (nrow(temp) > 1){
-     doc.unique3$ProjectID[i] <- temp$ProjectID[1]
-     doc.unique3$DOC[i] <- mean(temp$DOC)
-     doc.unique3$Date[i] <- paste('multiple readings for this sample in file', temp$Date[1], sep = " ")
-     doc.unique3$Date_formatted[i] <- paste('multiple readings for this sample on date', temp$Date_formatted[1], sep  = " ")
-     doc.unique3$DOC_dilution_corrected[i] <- temp$DOC_dilution_corrected[1]
+doc.unique3 <- merge(doc.unique2, sample.log, by = "ProjectID", all.x = TRUE)
 
-     } else {
-       doc.unique3[i,c(1,3,4,5,6)] <- temp[1,]
-     }
- } else {
-   temp <- doc.unique2[doc.unique2$ProjectID == doc.unique3$ProjectID[i], ]
-   doc.unique3[i,c(1,3,4,5,6)] <- temp[1,]
- }
+for (i in 1:nrow(doc.unique3)){
+  if (is.na(doc.unique3$Keep[i])){
+    if (doc.unique3$Date_formatted[i] == doc.unique3$KeepDate[i]){
+      doc.unique3$Keep[i] = 1
+    } else {
+      doc.unique3$Keep[i] = 0
+    }
+  }
 }
+
+doc.unique3 <- subset(doc.unique3, doc.unique3$Keep == 1)
+
+doc.unique3 <- doc.unique3[,c('ProjectID', 'DOC', 'Date', 'Date_formatted')]
  
 write.csv(doc.unique3, 'cached_data/cleanedDOCdata.csv', row.names = FALSE)
