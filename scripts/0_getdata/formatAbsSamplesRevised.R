@@ -76,6 +76,9 @@ formatAbsSamplesRevised <- function(dateLower,dateUpper,Type,Project){
     allFiles <- list.files(path='.')
     
     DescriptionFile <- allFiles[grep('Sample Log',allFiles)]
+    if (length(grep("\\$", DescriptionFile)) > 0){
+      DescriptionFile <- DescriptionFile[-grep("\\$", DescriptionFile)]
+    }
 
     if (length(DescriptionFile)==0|length(grep('.xlsx', DescriptionFile))>1|length(grep('Test', DescriptionFile))>0) {
       AbsList[[i]] <- NA
@@ -113,8 +116,9 @@ formatAbsSamplesRevised <- function(dateLower,dateUpper,Type,Project){
       if (Project == ''){
         DescriptionFile <- DescriptionFile
       }else{
+        #col.num <- grep('project', names(DescriptionFile), ignore.case = TRUE)
         DescriptionFile <- DescriptionFile[which(DescriptionFile[,9]==Project),]
-        if(length(which(DescriptionFile[,col.num]==Project))<1) next}
+        if(length(which(DescriptionFile[,9]==Project))<1) next}
       
       if(Type =='Environmental Samples'){
         exclude <- grep('lank',DescriptionFile[,1],ignore.case = TRUE)
