@@ -1,11 +1,11 @@
 # this script cleans data from
 # formatAbsSamplesRevised function
-# transforms data frame so that each wavelength becomes
+# transposes data frame so that each wavelength becomes
 # a column and GRnumbers are all in single column (samples by rows)
 
 library(USGSHydroOpt)
 
-source("/scripts/0_getdata/getdata_aqualog.R")
+source("scripts/0_getdata/getdata_aqualog.R")
 
 rawAbs <- read.csv("raw_data/rawCompiledAbs.csv")
 
@@ -27,7 +27,7 @@ wavs <- wavs[which(wavs<=700)]
 testAbs <- getAbs(rawAbs,'Wavelength',wavs,"Group",test,"GRnumber")
 
 # write data to cached data fikder
-write.csv(testAbs, "cached_data/SummaryAbsCoef.csv", row.names = FALSE)
+write.csv(testAbs, "cached_data/transposedAbsCoef.csv", row.names = FALSE)
 
 ###################################################
 
