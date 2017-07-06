@@ -1,7 +1,8 @@
 # this script cleans data from
 # formatAbsSamplesRevised function
-# gets summary data from getAbs
-# saves summarized data
+# transforms data frame so that each wavelength becomes
+# a column and GRnumbers are all in single column (samples by rows)
+
 library(USGSHydroOpt)
 
 source("/scripts/0_getdata/getdata_aqualog.R")
@@ -23,7 +24,6 @@ colnames(test) <- "GRnumber"
 wavs <- unique(rawAbs$Wavelength)
 wavs <- wavs[which(wavs<=700)]
 
-# get rid of NA values 
 testAbs <- getAbs(rawAbs,'Wavelength',wavs,"Group",test,"GRnumber")
 
 # write data to cached data fikder
