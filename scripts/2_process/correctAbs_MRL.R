@@ -24,6 +24,7 @@ GRnums <- names(abs.cleaned)[2:length(abs.cleaned)]
 # function outputs two dataframes - one with adjusted values, the other with "<" for all corrected values
 abs.corrected <- absMRLAdjust(dfabs = abs.cleaned, dfMRLs = MRL.all, Wavelength = 'Wavelength', sampleGRnums = GRnums, multiplier = 0.5)
 
+abs.censored <- abs.corrected[[2]]
 # find out how many censored values we have for each wavelength to determine which wavelengths we should use
 # turn "<" into NAs
 # maybe add this to function in the future
@@ -39,7 +40,9 @@ png('figures/Abs_prop_censored.png')
 plot(prop_censored~Wavelength, data = abs.censored, ylab = "Proportion of Samples < MDL", cex.lab = 1.3)
 dev.off()
 
+write.csv(abs.corrected[[1]],'cached_data/correctedAbsData.csv',row.names = FALSE)
 
+#######################################################
 # test if blanks by site makes a difference
 # that is, is there contamination at any sites?
 
