@@ -1,7 +1,7 @@
 library(USGSHydroOpt)
-source('/scripts/2_process/calcAbsCoef.R')
+source('/scripts/1_munge/transposeAbsData.R')
 FinalAbsDf <- read.csv("raw_data/rawCompiledAbs.csv", header = TRUE)
-abscoef <- read.csv('cached_data/SummaryAbsCoef.csv', header = TRUE)
+abscoef <- read.csv('cached_data/transposedAbsCoef.csv', header = TRUE)
 
 # Filter out specific column names
 finalcols <- colnames(FinalAbsDf)
