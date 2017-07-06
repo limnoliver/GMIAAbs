@@ -1,6 +1,8 @@
 # read in transposed absorbance data where each wavelength has own column
 abscoef <- read.csv('cached_data/transposedAbsCoef.csv', header = TRUE)
 
+# read in raw data to see imported data
+abs.raw <- read.csv('raw_data/rawCompiledAbs.csv')
 
 temp <- as.character(abscoef$GRnumber)
 
@@ -24,6 +26,29 @@ samples.keep <- samples.keep[-grep('^Q', samples.keep)]
 # get rid of duplicated or diluted samples
 samples.keep <- samples.keep[-grep('dil|dup',samples.keep, ignore.case = TRUE)]
 
+# get rid of random samples that made it through that have long names - think these were runs of the deicers themselves
+samples.keep <- samples.keep[-which(nchar(samples.keep)>12)]
+
+# some duplicate Project IDs left - pull in optics sample log to verify we are using the correct date for each sample
+samples.compare <- abscoef[which(abscoef$ProjectID %in% samples.keep), ]
+sample.log <- read_xlsx('M:/NonPoint Evaluation/gmia/SLOH labforms and budget/optics.sample.log.ALL.xlsx')
+samples.compare <- samples.compare[,c('date', 'ProjectID')]
+names(sample.log)[2] <- 'ProjectID'
+sample.log$ProjectID <- gsub('-', '.', sample.log$ProjectID)
+
+comparison <- merge(sample.log[,c(2,7)], samples.compare, all.x = TRUE)
+
+for (i in 1:nrow(comparison)){
+  if (comparison$`Optics processed date`[i] %in% comparison$date[i]) {
+    comparison$test[i] <- 'correct'
+  } else if (comparison$`Optics processed date`[i] == 'No Sample' & is.na(comparison$date[i])) {
+    comparison$test[i] <- 'correct'
+  } else if (nchar(comparison$`Optics processed date`[i]) == 8 & is.na(comparison$date[i])) {
+    comparison$test[i] <- 'missing'
+  } else {
+    comparison$test[i] <- 'wrong date'
+  }
+}
 # find site-specific duplicates
 abscoefOAK <- abscoef[grep("OAK",abscoef$ProjectID),]
 # remove duplicate sample for OAK site
