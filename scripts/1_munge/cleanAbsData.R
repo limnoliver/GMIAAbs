@@ -2,9 +2,6 @@ library(readxl)
 # read in transposed absorbance data where each wavelength has own column
 abscoef <- read.csv('cached_data/transposedAbsCoef.csv', header = TRUE)
 
-# read in raw data to see imported data
-abs.raw <- read.csv('raw_data/rawCompiledAbs.csv')
-
 temp <- as.character(abscoef$GRnumber)
 
 # extract date from GRnumber
@@ -64,7 +61,14 @@ for (i in 1:nrow(abscoef.f)){
 }
 
 # filter out duplicated samples with the wrong date
-
 abscoef.f <- abscoef.f[abscoef.f$remove == FALSE, ]
 
 write.csv(abscoef.f,'cached_data/cleanedAbsData.csv', row.names = FALSE)
+
+# use above cleaning to filter raw samples as well for any further
+# functions that use the raw file but only need appropriate samples
+samples.keep <- as.character(abscoef.f$GRnumber)
+
+# read in raw data
+abs.raw <- read.csv('raw_data/rawCompiledAbs.csv')
+
