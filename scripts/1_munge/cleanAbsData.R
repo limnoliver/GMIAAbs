@@ -42,6 +42,7 @@ unique.PID <- unique(abscoef.f$ProjectID)
 # some duplicate Project IDs left - pull in optics sample log to verify we are using the correct date for each sample
 
 sample.log <- read_xlsx('M:/NonPoint Evaluation/gmia/SLOH labforms and budget/optics.sample.log.ALL.xlsx')
+names(sample.log)[2] <- 'ProjectID'
 sample.log$ProjectID <- gsub('-', '.', sample.log$ProjectID)
 
 
@@ -69,7 +70,6 @@ abscoef.f <- abscoef.f[abscoef.f$remove == FALSE, ]
 # do comparison
 samples.compare <- abscoef.f
 samples.compare <- samples.compare[,c('date', 'ProjectID')]
-names(sample.log)[2] <- 'ProjectID'
 
 
 comparison <- merge(sample.log[,c(2,7)], samples.compare, all.x = TRUE)
@@ -87,57 +87,5 @@ for (i in 1:nrow(comparison)){
 }
 
 comparison$duplicated <- duplicated(comparison$ProjectID)
-
-
-# for samples with double entries, look at the optics log and pick correct date
-
-
-
-
-# find site-specific duplicates
-abscoefOAK <- abscoef[grep("OAK",abscoef$ProjectID),]
-# remove duplicate sample for OAK site
-abscoefOAK <- abscoefOAK[which(paste(abscoefOAK$ProjectID,abscoefOAK$date,sep="")!="OAK.S10720140225"),]
-
-abscoefOUT <- abscoef[substr(abscoef$ProjectID,1,2) %in% c("OU","Ou"),]
-abscoefOUT <- abscoefOUT[-grep(".R",abscoefOUT$ProjectID),]
-# remove duplicate samples for OUT site
-abscoefOUT <- abscoefOUT[which(paste(abscoefOUT$ProjectID,abscoefOUT$date,sep="")!="OUT.S10720140225"),]
-abscoefOUT <- abscoefOUT[which(paste(abscoefOUT$ProjectID,abscoefOUT$date,sep="")!="OUT.S107G20140225"),]
-abscoefOUT <- abscoefOUT[which(substr(abscoefOUT$GRnumber,1,18)!="OUT.S110G_Group003"),]
-abscoefOUT <- abscoefOUT[which(abscoefOUT$ProjectID!="OUT.S118-D"),]
-abscoefOUT <- abscoefOUT[which(substr(abscoefOUT$GRnumber,1,10)!="OUT.S114D_"),]
-abscoefOUT <- abscoefOUT[which(substr(abscoefOUT$GRnumber,1,10)!="OUT.S114E_"),]
-abscoefOUT <- abscoefOUT[which(substr(abscoefOUT$GRnumber,1,10)!="OUT.S114F_"),]
-abscoefOUT <- abscoefOUT[which(substr(abscoefOUT$GRnumber,1,10)!="OUT.S114G_"),]
-abscoefOUT <- abscoefOUT[which(substr(abscoefOUT$GRnumber,1,10)!="OUT.S114H_"),]
-abscoefOUT <- abscoefOUT[which(substr(abscoefOUT$GRnumber,1,10)!="OUT.S114J_"),]
-abscoefOUT <- abscoefOUT[which(substr(abscoefOUT$GRnumber,1,10)!="OUT.S114K_"),]
-abscoefOUT$ProjectID <- gsub('Out','OUT',abscoefOUT$ProjectID)
-
-abscoefCG <- abscoef[grep("CG.",abscoef$ProjectID),]
-# remove duplicate and QC samples for CG site
-abscoefCG <- abscoefCG[which(paste(abscoefCG$ProjectID,abscoefCG$date,sep="")!="CG.S10720140225"),]
-abscoefCG <- abscoefCG[which(abscoefCG$ProjectID!="CG.S116B"),]
-abscoefCG <- abscoefCG[which(abscoefCG$ProjectID!="CG.Q23C"),]
-
-abscoefLK <- abscoef[grep("LK.",abscoef$ProjectID),]
-# remove duplicate and QC samples for LK site
-
-#############
-# Fix? Not sure this part is doing what it's supposed to
-############
-abscoefLK <- abscoefLK[which(abscoefLK$ProjectID!="LK.Q23C"),]
-abscoefLK <- abscoefLK[-grep(".R",abscoefLK$ProjectID),]
-abscoefLK <- abscoefLK[which(paste(abscoefLK$ProjectID,abscoefLK$date,sep="")!="LK.S10720140225"),]
-abscoefLK <- abscoefLK[which(paste(abscoefLK$ProjectID,abscoefLK$date,sep="")!="LK.S107G20140225"),]
-
-abscoefWorking <- rbind(abscoefOUT,abscoefCG)
-abscoefWorking <- rbind(abscoefWorking,abscoefLK)
-abscoefWorking <- rbind(abscoefWorking,abscoefOAK)
-# after merging sites of interest, remove any remaining QC samples
-abscoefWorking <- abscoefWorking[-which(substr(abscoefWorking$GRnumber,1,1)=='Q'),]
-# limit samples to Nov-April deicing period
-abscoefWorking <- abscoefWorking[-which(abscoefWorking$ProjectID %in% c("OUT.S110","OUT.S110G","OUT.S117","OUT.S118","CG.S110","CG.S117","CG.S118","LK.S110","LK.S110G","LK.S117","LK.S118","OAK.S110","OAK.S118")),]
 
 write.csv(abscoefWorking,'cached_data/AbsData.csv', row.names = FALSE)
