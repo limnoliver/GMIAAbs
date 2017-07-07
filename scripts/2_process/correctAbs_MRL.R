@@ -15,7 +15,7 @@ blankGRnums.all <- grep('^Q[[:alpha:]]', names(abs.raw), value = TRUE)
 MRL.all <- absMRL(abs.raw, "Wavelength", blankGRnums.all)
 
 # read in cleaned absorbance data
-abs.cleaned <- read.csv("cached_data/SummarizedAbsData.csv")
+abs.cleaned <- read.csv("cached_data/cleanedAbsData.csv")
 wl.column <- grep('Wavelength', names(abs.cleaned))
 abs.cleaned <- abs.cleaned[,c(wl.column, 1:(wl.column-1))]
 GRnums <- names(abs.cleaned)[2:length(abs.cleaned)]
