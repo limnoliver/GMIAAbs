@@ -67,25 +67,4 @@ for (i in 1:nrow(abscoef.f)){
 
 abscoef.f <- abscoef.f[abscoef.f$remove == FALSE, ]
 
-# do comparison
-samples.compare <- abscoef.f
-samples.compare <- samples.compare[,c('date', 'ProjectID')]
-
-
-comparison <- merge(sample.log[,c(2,7)], samples.compare, all.x = TRUE)
-
-for (i in 1:nrow(comparison)){
-  if (comparison$`Optics processed date`[i] %in% comparison$date[i]) {
-    comparison$test[i] <- 'correct'
-  } else if (comparison$`Optics processed date`[i] == 'No Sample' & is.na(comparison$date[i])) {
-    comparison$test[i] <- 'correct'
-  } else if (nchar(comparison$`Optics processed date`[i]) == 8 & is.na(comparison$date[i])) {
-    comparison$test[i] <- 'missing'
-  } else {
-    comparison$test[i] <- 'wrong date'
-  }
-}
-
-comparison$duplicated <- duplicated(comparison$ProjectID)
-
-write.csv(abscoefWorking,'cached_data/AbsData.csv', row.names = FALSE)
+write.csv(abscoef.f,'cached_data/cleanedAbsData.csv', row.names = FALSE)
