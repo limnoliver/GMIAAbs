@@ -134,6 +134,12 @@ formatAbsSamplesRevised <- function(dateLower,dateUpper,Type,Project){
             DescriptionFile <- DescriptionFile[-c(exclude),]
           }
       }
+      # add a function that gets rid of samples labeled "1" in the "exclude" column
+      # (if there is this column)
+      if (length(grep('exclude', names(DescriptionFile), ignore.case = TRUE)) > 0) {
+        col.num <- grep('exclude', names(DescriptionFile), ignore.case = TRUE)
+        DescriptionFile <- DescriptionFile[-which(DescriptionFile[,col.num] == 1), ]
+      }
       
       if(Type == 'Blank'){
         n = grep('bla',DescriptionFile[,1],ignore.case = TRUE)
