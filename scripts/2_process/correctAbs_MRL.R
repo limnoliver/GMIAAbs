@@ -16,13 +16,21 @@ MRL.all <- absMRL(abs.raw, "Wavelength", blankGRnums.all)
 
 # read in cleaned absorbance data
 abs.cleaned <- read.csv("cached_data/cleanedAbsData.csv")
-wl.column <- grep('Wavelength', names(abs.cleaned))
-abs.cleaned <- abs.cleaned[,c(wl.column, 1:(wl.column-1))]
-GRnums <- names(abs.cleaned)[2:length(abs.cleaned)]
+GRnums <- as.character(abs.cleaned$GRnumber)
+Wavelength <- grep("A", names(abs.cleaned), value = TRUE)
+Wavelength <- gsub("A", "", Wavelength)
+
+abs.t.cleaned <- as.data.frame(t(abs.cleaned[,2:(ncol(abs.cleaned)-4)]))
+names(abs.t.cleaned) <- GRnums
+abs.t.cleaned$Wavelength <- Wavelength
+
+wl.column <- grep('Wavelength', names(abs.t.cleaned))
+abs.cleaned <- abs.t.cleaned[,c(wl.column, 1:(wl.column-1))]
+#GRnums <- names(abs.cleaned)[2:length(abs.cleaned)]
 
 # adjust values from MRL - here setting to 1/2 MRL
 # function outputs two dataframes - one with adjusted values, the other with "<" for all corrected values
-abs.corrected <- absMRLAdjust(dfabs = abs.cleaned, dfMRLs = MRL.all, Wavelength = 'Wavelength', sampleGRnums = GRnums, multiplier = 0.5)
+abs.corrected <- absMRLAdjust(dfabs = abs.t.cleaned, dfMRLs = MRL.all, Wavelength = 'Wavelength', sampleGRnums = GRnums, multiplier = 0.5)
 
 abs.censored <- abs.corrected[[2]]
 # find out how many censored values we have for each wavelength to determine which wavelengths we should use
@@ -36,11 +44,11 @@ count_na <- function(x) sum(is.na(x))
 abs.censored$n_censored <- apply(abs.censored, 1, count_na)
 abs.censored$prop_censored <- abs.censored$n_censored/(length(abs.censored)-1)
 
+write.csv(abs.corrected[[1]],'cached_data/correctedAbsData.csv',row.names = FALSE)
+
 png('figures/Abs_prop_censored.png')
 plot(prop_censored~Wavelength, data = abs.censored, ylab = "Proportion of Samples < MDL", cex.lab = 1.3)
 dev.off()
-
-write.csv(abs.corrected[[1]],'cached_data/correctedAbsData.csv',row.names = FALSE)
 
 #######################################################
 # test if blanks by site makes a difference
