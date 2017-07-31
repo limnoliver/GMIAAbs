@@ -12,6 +12,7 @@ samples.compare <- read.csv('cached_data/cleanedAbsData.csv')
 
 # filter to only date and ProjectID
 samples.compare <- samples.compare[,c('date', 'ProjectID')]
+samples.compare$ProjectID <- toupper(samples.compare$ProjectID)
 
 # read in sample log and make it compatible for merge to samples.compare
 sample.log <- read_xlsx('M:/NonPoint Evaluation/gmia/SLOH labforms and budget/optics.sample.log.ALL.xlsx')
