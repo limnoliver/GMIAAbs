@@ -88,7 +88,7 @@ formatAbsSamplesRevised <- function(dateLower,dateUpper,Type,Project){
       DescriptionFile <- DescriptionFile[which(DescriptionFile[,1] !=''),]
       } else {
       filename <- DescriptionFile
-      discard <- grep('b', filename)
+      discard <- grep('\\D\\.xlsx', filename)
       if (length(discard)>0 & length(filename)>1) {
         filename = filename[-discard]
       }
