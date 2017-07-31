@@ -33,4 +33,3 @@ FinalAbsDf[is.na(FinalAbsDf)] <- min(FinalAbsDf$minAbs)
 
 write.csv(FinalAbsDf, "cached_data/SummarizedAbsData.csv", row.names = FALSE)
 
-test <- read.csv("cached_data/SummarizedAbsData.csv")
