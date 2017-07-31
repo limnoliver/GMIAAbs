@@ -25,7 +25,7 @@ rangeGap <- c(605,662)
 dataSummary <- testdfOpt
 testdfOpt2 <- getExpResid(wavelength,rangeReg,rangeGap,dataAbs,waveCol,colSubsetString,dataSummary,grnum)
 cols2 <- colnames(testdfOpt2)
-cols2 <- cols2[1:158]
+cols2 <- cols2[1:(length(cols2)-2)]
 cols2 <- c(cols2,"Resids490","Resids630")
 colnames(testdfOpt2) <- cols2
 
