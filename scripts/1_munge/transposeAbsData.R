@@ -22,11 +22,11 @@ test <- data.frame(testnames,stringsAsFactors=FALSE)
 
 colnames(test) <- "GRnumber"
 wavs <- unique(rawAbs$Wavelength)
-wavs <- wavs[which(wavs<=700)]
+#wavs <- wavs[which(wavs<=700)]
 
 testAbs <- getAbs(rawAbs,'Wavelength',wavs,"Group",test,"GRnumber")
 
-# write data to cached data fikder
+# write data to cached data directory
 write.csv(testAbs, "cached_data/transposedAbsCoef.csv", row.names = FALSE)
 
 ###################################################
