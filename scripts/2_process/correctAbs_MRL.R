@@ -18,11 +18,11 @@ MRL.all <- absMRL(abs.raw, "Wavelength", blankGRnums.all)
 abs.cleaned <- read.csv("cached_data/cleanedAbsData.csv")
 GRnums <- as.character(abs.cleaned$GRnumber)
 Wavelength <- grep("A", names(abs.cleaned), value = TRUE)
-Wavelength <- gsub("A", "", Wavelength)
+Wavelength.num <- gsub("A", "", Wavelength)
 
 abs.t.cleaned <- as.data.frame(t(abs.cleaned[,2:(ncol(abs.cleaned)-4)]))
 names(abs.t.cleaned) <- GRnums
-abs.t.cleaned$Wavelength <- Wavelength
+abs.t.cleaned$Wavelength <- Wavelength.num
 
 wl.column <- grep('Wavelength', names(abs.t.cleaned))
 abs.cleaned <- abs.t.cleaned[,c(wl.column, 1:(wl.column-1))]
@@ -44,7 +44,10 @@ count_na <- function(x) sum(is.na(x))
 abs.censored$n_censored <- apply(abs.censored, 1, count_na)
 abs.censored$prop_censored <- abs.censored$n_censored/(length(abs.censored)-1)
 
-write.csv(abs.corrected[[1]],'cached_data/correctedAbsData.csv',row.names = FALSE)
+abs.corrected.t <- as.data.frame(t(abs.corrected[[1]][,-grep('Wavelength', names(abs.corrected[[1]]))]))
+names(abs.corrected.t) <- Wavelength
+abs.corrected.t$GRnumber <- row.names(abs.corrected.t)
+write.csv(abs.corrected.t,'cached_data/correctedAbsData.csv',row.names = FALSE)
 
 png('figures/Abs_prop_censored.png')
 plot(prop_censored~Wavelength, data = abs.censored, ylab = "Proportion of Samples < MDL", cex.lab = 1.3)
