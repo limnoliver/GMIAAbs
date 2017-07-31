@@ -1,7 +1,7 @@
 library(USGSHydroOpt)
 
 # read in processed data
-testAbsWorking <- read.csv('cached_data/AbsData.csv')
+testAbsWorking <- read.csv('cached_data/cleanedAbsData.csv')
 FinalAbsDf <- read.csv('cached_data/SummarizedAbsData.csv')
 
 # set wavelengths of interest, use getExpResid to calculate residuals
