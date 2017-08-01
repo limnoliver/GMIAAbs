@@ -1,6 +1,8 @@
 # script that uses output from absResiduals, and adds spectral slopes
 # read in dataframe that has residuals calculated
 # import processed data
+source('scripts/2_process/absResiduals.R')
+
 absResiduals <- read.csv('cached_data/absResiduals.csv')
 dataAbs <- read.csv('cached_data/correctedAbsData.csv')
 
