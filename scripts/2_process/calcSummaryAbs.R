@@ -1,8 +1,8 @@
-library(USGSHydroOpt)
-source('/scripts/1_munge/transposeAbsData.R')
+# this script creates summarizes absorbances by wavelength and site
+# across all samples
+# input required is each column as sample, with a column for wavelengths
 
 AbsDf <- read.csv("cached_data/correctedAbsData.csv", header = TRUE)
-
 
 # define groups by site
 finalcolsOUT <- grep('out\\.', names(AbsDf), ignore.case = TRUE)
