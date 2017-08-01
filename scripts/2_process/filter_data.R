@@ -25,5 +25,5 @@ start.abs <- grep('A800', names(filt.dat))
 end.abs <- grep('A503', names(filt.dat))
 filt.dat <- filt.dat[,-(start.abs:end.abs)]
 
-write.csv(filt.dat, 'cached_data/modelinput_dat.csv', row.names = FALSE)
+write.csv(filt.dat, 'cached_data/filteredWQ_DOC_ABS.csv', row.names = FALSE)
 
