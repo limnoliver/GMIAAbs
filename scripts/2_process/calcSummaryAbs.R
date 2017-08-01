@@ -1,35 +1,24 @@
 library(USGSHydroOpt)
 source('/scripts/1_munge/transposeAbsData.R')
-FinalAbsDf <- read.csv("raw_data/rawCompiledAbs.csv", header = TRUE)
 
-# use the filtered abs data to define which columsn to keep
-cleanAbs <- read.csv('cached_data/cleanedAbsData.csv')
-col.keep <- unique(cleanAbs$GRnumber)
-col.keep <- as.character(col.keep)
-col.keep <- c(col.keep, 'Wavelength')
+AbsDf <- read.csv("cached_data/correctedAbsData.csv", header = TRUE)
 
-# change GRnumbers to match col.keep
-testnames <- colnames(FinalAbsDf)
-testnames <- gsub("USGS","Group",testnames)
-colnames(FinalAbsDf) <- testnames
-rawAbs.f <- FinalAbsDf[,col.keep]
 
 # define groups by site
-finalcolsOUT <- grep('out\\.', names(rawAbs.f), ignore.case = TRUE)
-finalcolsCG <- grep('cg\\.', names(rawAbs.f), ignore.case = TRUE)
-finalcolsLK <- grep('lk\\.', names(rawAbs.f), ignore.case = TRUE)
-finalcolsOA <- grep('oak\\.', names(rawAbs.f), ignore.case = TRUE)
-#finalcolsUS <- grep('us\\.', names(rawAbs.f), ignore.case = TRUE)
+finalcolsOUT <- grep('out\\.', names(AbsDf), ignore.case = TRUE)
+finalcolsCG <- grep('cg\\.', names(AbsDf), ignore.case = TRUE)
+finalcolsLK <- grep('lk\\.', names(AbsDf), ignore.case = TRUE)
+finalcolsOA <- grep('oak\\.', names(AbsDf), ignore.case = TRUE)
+#finalcolsUS <- grep('us\\.', names(AbsDf), ignore.case = TRUE)
 finalcolsALL <- c(finalcolsOUT, finalcolsCG, finalcolsLK, finalcolsOA)
 
-FinalAbsDf$meanAbs <- rowMeans(FinalAbsDf[,finalcolsALL])
-FinalAbsDf$meanAbsOUT <- rowMeans(FinalAbsDf[,finalcolsOUT])
-FinalAbsDf$meanAbsCG <- rowMeans(FinalAbsDf[,finalcolsCG])
-FinalAbsDf$meanAbsLK <- rowMeans(FinalAbsDf[,finalcolsLK])
-FinalAbsDf$meanAbsOA <- rowMeans(FinalAbsDf[,finalcolsOA])
-FinalAbsDf[FinalAbsDf<0] <- NA
-FinalAbsDf$minAbs <- do.call(pmin,c(FinalAbsDf[,finalcolsALL],na.rm=TRUE))
-FinalAbsDf[is.na(FinalAbsDf)] <- min(FinalAbsDf$minAbs)
+AbsDf$meanAbs <- rowMeans(AbsDf[,finalcolsALL])
+AbsDf$meanAbsOUT <- rowMeans(AbsDf[,finalcolsOUT])
+AbsDf$meanAbsCG <- rowMeans(AbsDf[,finalcolsCG])
+AbsDf$meanAbsLK <- rowMeans(AbsDf[,finalcolsLK])
+AbsDf$meanAbsOA <- rowMeans(AbsDf[,finalcolsOA])
+AbsDf$minAbs <- do.call(pmin,c(AbsDf[,finalcolsALL],na.rm=TRUE))
+#AbsDf[is.na(AbsDf)] <- min(AbsDf$minAbs)
 
-write.csv(FinalAbsDf, "cached_data/SummarizedAbsData.csv", row.names = FALSE)
+write.csv(AbsDf, "cached_data/SummarizedAbsData.csv", row.names = FALSE)
 
