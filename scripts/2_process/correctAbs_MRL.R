@@ -44,10 +44,11 @@ count_na <- function(x) sum(is.na(x))
 abs.censored$n_censored <- apply(abs.censored, 1, count_na)
 abs.censored$prop_censored <- abs.censored$n_censored/(length(abs.censored)-1)
 
-abs.corrected.t <- as.data.frame(t(abs.corrected[[1]][,-grep('Wavelength', names(abs.corrected[[1]]))]))
-names(abs.corrected.t) <- Wavelength
-abs.corrected.t$GRnumber <- row.names(abs.corrected.t)
-write.csv(abs.corrected.t,'cached_data/correctedAbsData.csv',row.names = FALSE)
+#abs.corrected.t <- as.data.frame(t(abs.corrected[[1]][,-grep('Wavelength', names(abs.corrected[[1]]))]))
+#names(abs.corrected.t) <- Wavelength
+#abs.corrected.t$GRnumber <- row.names(abs.corrected.t)
+
+write.csv(abs.corrected[[1]],'cached_data/correctedAbsData.csv',row.names = FALSE)
 
 png('figures/Abs_prop_censored.png')
 plot(prop_censored~Wavelength, data = abs.censored, ylab = "Proportion of Samples < MDL", cex.lab = 1.3)
