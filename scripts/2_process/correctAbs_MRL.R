@@ -19,14 +19,13 @@ abs.cleaned <- read.csv("cached_data/cleanedAbsData.csv")
 GRnums <- as.character(abs.cleaned$GRnumber)
 Wavelength <- grep("A", names(abs.cleaned), value = TRUE)
 Wavelength.num <- gsub("A", "", Wavelength)
+storms <- abs.cleaned[,c('GRnumber', 'date', 'datetime', 'ProjectID')]
 
 abs.t.cleaned <- as.data.frame(t(abs.cleaned[,2:(ncol(abs.cleaned)-4)]))
 names(abs.t.cleaned) <- GRnums
 abs.t.cleaned$Wavelength <- Wavelength.num
-
 wl.column <- grep('Wavelength', names(abs.t.cleaned))
-abs.cleaned <- abs.t.cleaned[,c(wl.column, 1:(wl.column-1))]
-#GRnums <- names(abs.cleaned)[2:length(abs.cleaned)]
+abs.t.cleaned <- abs.t.cleaned[,c(wl.column, 1:(wl.column-1))]
 
 # adjust values from MRL - here setting to 1/2 MRL
 # function outputs two dataframes - one with adjusted values, the other with "<" for all corrected values
@@ -44,11 +43,13 @@ count_na <- function(x) sum(is.na(x))
 abs.censored$n_censored <- apply(abs.censored, 1, count_na)
 abs.censored$prop_censored <- abs.censored$n_censored/(length(abs.censored)-1)
 
-#abs.corrected.t <- as.data.frame(t(abs.corrected[[1]][,-grep('Wavelength', names(abs.corrected[[1]]))]))
-#names(abs.corrected.t) <- Wavelength
-#abs.corrected.t$GRnumber <- row.names(abs.corrected.t)
+abs.corrected.t <- as.data.frame(t(abs.corrected[[1]][,-grep('Wavelength', names(abs.corrected[[1]]))]))
+names(abs.corrected.t) <- Wavelength
+abs.corrected.t$GRnumber <- row.names(abs.corrected.t)
+abs.corrected.t <- merge(abs.corrected.t, storms, by = 'GRnumber', all.x = TRUE)
 
 write.csv(abs.corrected[[1]],'cached_data/correctedAbsData.csv',row.names = FALSE)
+write.csv(abs.corrected.t, 'cached_data/tcorrectedAbsData.csv', row.names = FALSE)
 
 png('figures/Abs_prop_censored.png')
 plot(prop_censored~Wavelength, data = abs.censored, ylab = "Proportion of Samples < MDL", cex.lab = 1.3)
