@@ -1,22 +1,20 @@
 library(USGSHydroOpt)
 
 # read in processed data
-testAbsWorking <- read.csv('cached_data/cleanedAbsData.csv')
-FinalAbsDf <- read.csv('cached_data/SummarizedAbsData.csv')
+dataAbs <- read.csv('cached_data/correctedAbsData.csv')
+dataSummary <- data.frame(GRnumber = names(dataAbs)[-1])
+
 
 # set wavelengths of interest, use getExpResid to calculate residuals
 wavelength <- 491
 rangeReg <- c(419,602)
 rangeGap <- c(461,521)
-colsAbs <- unique(testAbsWorking$GRnumber)
-#colsAbs <- colsAbs[-which(substr(colsAbs,1,1)=='Q')]
-colsAbs <- c(as.character(colsAbs),"Wavelength")
-dataAbs <- FinalAbsDf[,colsAbs]
 waveCol <- "Wavelength"
 colSubsetString <- "Gr"
-dataSummary <- testAbsWorking
 grnum <- "GRnumber"
+
 testdfOpt <- getExpResid(wavelength,rangeReg,rangeGap,dataAbs,waveCol,colSubsetString,dataSummary,grnum)
+names(testdfOpt)[ncol(testdfOpt)] <- 'Resids491'
 
 # do same as above, but at different wavelength. merge data frames together
 wavelength <- 629
@@ -24,10 +22,7 @@ rangeReg <- c(560,698)
 rangeGap <- c(605,662)
 dataSummary <- testdfOpt
 testdfOpt2 <- getExpResid(wavelength,rangeReg,rangeGap,dataAbs,waveCol,colSubsetString,dataSummary,grnum)
-cols2 <- colnames(testdfOpt2)
-cols2 <- cols2[1:(length(cols2)-2)]
-cols2 <- c(cols2,"Resids490","Resids630")
-colnames(testdfOpt2) <- cols2
+names(testdfOpt2)[ncol(testdfOpt2)] <- 'Resids629'
 
 # do same as above, but at different wavelength. merge data frames together
 wavelength <- 422
