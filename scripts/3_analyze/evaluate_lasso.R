@@ -5,8 +5,10 @@
 obs <- df[,response]
 residuals <- resid(cM.all)
 preds <- predict(cM.all)
-top.pred <- df$Sag281_299
 
+top.pred.row <- which.max(as.numeric(final.varimp$importance[,1]))
+top.pred <- row.names(final.varimp$importance)[top.pred.row]
+top.pred <- df[,top.pred]
 # pull out storm month to assess time effect
 months <- all.dat[df.complete,'date']
 months <- substr(months, start = 5, stop = 6)
@@ -18,7 +20,7 @@ sites <- substr(sites, start=1, stop=2)
 # look at obs, pred, residuals by month and by site
 plot(residuals, col = as.factor(months), pch = 16)
 plot(residuals, col = as.factor(sites), pch = 16)
-plot(residuals~obs, col = as.factor(sites), pch = 16)
+plot(residuals~preds, col = as.factor(sites), pch = 16)
 
 abline(0,1,col = 'red')
 legend('bottomright', legend = levels(as.factor(months)), pch = 16, col = c(1:length(levels(as.factor(months)))))
