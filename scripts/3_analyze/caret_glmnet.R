@@ -4,7 +4,8 @@ library(caret)
 
 ctrl <- trainControl(method = 'cv',
                      number = 5,
-                     repeats = 1)
+                     repeats = 1, 
+                     selectionFunction = "oneSE")
 
 tuning.pars <- list()
 coefs <- data.frame(var.names = predictors,
@@ -36,10 +37,10 @@ cM.all <- train(matIVs, y,
             tuneLength = 10,
             preProcess = c('center', 'scale'))
 
-final.varimp <- varImp(cM)
+final.varimp <- varImp(cM.all)
 
 # get coefficients from final model
-coefs.final <- coef(cM$finalModel, cM$bestTune$lambda)
+coefs.final <- coef(cM.all$finalModel, cM.all$bestTune$lambda)
 
 plot(df$COD~test, xlab = 'Predicted', ylab = 'Observed')
 abline(0,1,col = 'red')
