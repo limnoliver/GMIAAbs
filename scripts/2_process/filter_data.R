@@ -5,10 +5,10 @@
 all.dat <- read.csv('cached_data/mergedWQ_DOC_ABS.csv', stringsAsFactors = FALSE)
 
 # ID upstream events
-us <- grep('US', all.dat$ProjectID)
+sites.remove <- grep('US|LK|OAK', all.dat$ProjectID)
 
 # get rid of US events
-filt.dat <- all.dat[-us, ]
+filt.dat <- all.dat[-sites.remove, ]
 
 # ID summer events
 month <- substr(filt.dat$date, start = 5, stop = 6)
