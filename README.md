@@ -13,4 +13,8 @@ There are several steps required to clean and process the absorbance data. In or
 
 ## Modeling
 The goal of the project is to predict the water quality endpoints of airport deicer in streams (high COD, BOD, eythylene, acetate, etc) using optical properties (absorbance data). Because we have a large number of predictors (~100) and relatively few data points (~200), we want to use a modeling routine that can also do variable selection. We have chosen to use a LASSO with k-folds cross validation. The modeling procedure, in the context of this repository, is as follows:
-1. 
+1. filter merged data (`filter_data.R`) to only include relevant sites (cargo and outfall), relevant events (remove summer/non-deicer period events), and relevant predictor variables (remove absorbance at wavelengths > 500 due to high number of censored values)
+2. log-transform predictor variables that do not include zeros or negative values
+3. get rid of highly correlated indpendent variables using `caret`'s `findCorrelation` function (r = 0.99)
+4. run lasso using `glmnet` within `caret`, which repeats the k-folds (5) cross-validation 10 times, and optimizes both alpha and lambda (versus `cvglmnet` which only optimizes lambda)
+5. for dependent variables that have censored values, repeat this process setting censored values to DL, 0.5xDL, and 0.5xmin(non-censored values)
