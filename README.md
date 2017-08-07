@@ -16,5 +16,5 @@ The goal of the project is to predict the water quality endpoints of airport dei
 1. filter merged data (`filter_data.R`) to only include relevant sites (cargo and outfall), relevant events (remove summer/non-deicer period events), and relevant predictor variables (remove absorbance at wavelengths > 500 due to high number of censored values)
 2. log-transform predictor variables that do not include zeros or negative values
 3. get rid of highly correlated indpendent variables using `caret`'s `findCorrelation` function (r = 0.99)
-4. run lasso using `glmnet` within `caret`, which repeats the k-folds (5) cross-validation 10 times, and optimizes both alpha and lambda (versus `cvglmnet` which only optimizes lambda)
+4. run lasso using `glmnet` within `caret`, which repeats the k-folds (5) cross-validation 10 times, and optimizes both alpha and lambda (versus `cvglmnet` which only optimizes lambda). This function also centers and scales predictor variables, but returns coefficients in their original scale.
 5. for dependent variables that have censored values, repeat this process setting censored values to DL, 0.5xDL, and 0.5xmin(non-censored values)
