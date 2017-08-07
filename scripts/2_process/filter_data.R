@@ -25,7 +25,13 @@ start.abs <- grep('A800', names(filt.dat))
 end.abs <- grep('A503', names(filt.dat))
 filt.dat <- filt.dat[,-(start.abs:end.abs)]
 
+# get rid of slopes and resideuals that were calculated using
+# absorbance at WL > 500
 
+out <- c('Sag506_530', 'Sag530_551', 'Sag551_611', 'Sag611_650', 'Resids629')
+out.cols <- which(names(filt.dat) %in% out)
+
+filt.dat <- filt.dat[,-out.cols]
 
 write.csv(filt.dat, 'cached_data/filteredWQ_DOC_ABS.csv', row.names = FALSE)
 
