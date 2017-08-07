@@ -5,7 +5,7 @@ library(caret)
 all.dat <- read.csv('cached_data/filteredWQ_DOC_ABS.csv', stringsAsFactors = FALSE)
 
 # remove variables that are highly correlated
-predictors.all <- all.dat[,c(3:105)]
+predictors.all <- all.dat[,c(3:100)]
 predictors.cor <- cor(predictors.all)
 drop.predictors <- findCorrelation(predictors.cor, cutoff = 0.99, verbose = FALSE, exact = TRUE)
 predictors.keep <- names(predictors.all)[-drop.predictors]
@@ -45,7 +45,7 @@ df[,abs.ivs] <- log10(df[,abs.ivs])
 df[,response] <- log10(df[,response])
 
 # scale predictors
-df[,-1] <- scale(df[,-1])
+#df[,-1] <- scale(df[,-1])
 
 # create matrix for predictor vars
 matIVs = as.matrix(df[,-1])
