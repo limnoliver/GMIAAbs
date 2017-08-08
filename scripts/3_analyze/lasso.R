@@ -31,12 +31,14 @@ if (length(rows.left)>0|length(rows.right)>0) {
 }
 
 # reduce df to just response (first col) and predictors
+storms <- df$ProjectID
 response.col <- which(names(df) %in% response)
 predictor.cols <- which(names(df) %in% predictors)
 df <- df[,c(response, predictors)]
 df.complete <- complete.cases(df)
 df <- df[complete.cases(df),]
-
+storms <- storms[df.complete]
+sites <- substr(storms, 1, 2)
 # log transform absorbance IVs
 abs.ivs <- grep('A\\d+', names(df))
 df[,abs.ivs] <- log10(df[,abs.ivs])
@@ -45,7 +47,8 @@ df[,abs.ivs] <- log10(df[,abs.ivs])
 df[,response] <- log10(df[,response])
 
 # scale predictors
-#df[,-1] <- scale(df[,-1])
+save.process <- preProcess(df[,-1], method = c('center', 'scale'))
+df[,-1] <- scale(df[,-1])
 
 # create matrix for predictor vars
 matIVs = as.matrix(df[,-1])
@@ -53,6 +56,12 @@ colnames(matIVs) <- names(df)[-1]
 
 # set response var
 y = df[,1]
+
+# create diagnostic plots
+png(paste('figures/qqnorm_', response, '.png', sep = ''), height = 500, width = 500)
+qqnorm(y, main = paste('Normal Q-Q plot for ', response, sep = ''), cex.lab = 1.2)
+qqline(y)
+dev.off()
 
 # run bootstrap of glmnet
 mods <- bootstrap.glmnet(n.run = 10)
