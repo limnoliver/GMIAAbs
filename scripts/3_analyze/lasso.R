@@ -57,11 +57,3 @@ colnames(matIVs) <- names(df)[-1]
 # set response var
 y = df[,1]
 
-# create diagnostic plots
-png(paste('figures/qqnorm_', response, '.png', sep = ''), height = 500, width = 500)
-qqnorm(y, main = paste('Normal Q-Q plot for ', response, sep = ''), cex.lab = 1.2)
-qqline(y)
-dev.off()
-
-# run bootstrap of glmnet
-mods <- bootstrap.glmnet(n.run = 10)
