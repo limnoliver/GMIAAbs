@@ -25,22 +25,7 @@ plot(log10(all.dat$COD)~log10(all.dat$DOC), col = levels(as.factor(all.dat$date)
 legend("topleft", legend = levels(as.factor(all.dat$date)), pch = 16, col = levels(as.factor(all.dat$date)))
 
 
-# look at WQ data
 
-library(psych)
-wq.data <- dat.all[,c(175:202)]
-wq.data.use <- dat.all[,c(174, 186,196,202)]
-log.wq <- log10(wq.data.use)
-
-png('figures/log_wq_data_check.png', height = 1000, width = 1000)
-pairs.panels(log.wq, method = 'pearson', hist.col = "#00AFBB", density = FALSE, 
-             ellipses = FALSE, cex = 1.8, cex.cor = 1, col = "red", cex.axis = 2)
-dev.off()
-
-png('figures/wq_data_check.png', height = 1000, width = 1000)
-pairs.panels(wq.data.use, method = 'pearson', hist.col = "#00AFBB", density = FALSE, 
-             ellipses = FALSE, cex = 1.8, cex.cor = 1, col = "red", cex.lab = 1.3)
-dev.off()
 
 # some COD vs. acetate values look like outliers. E.g., COD is high when acetate is nondetect.
 # This could be just because PG is high and acetate is low, where COD is coming from PG
