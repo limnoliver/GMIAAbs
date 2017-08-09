@@ -1,4 +1,5 @@
 impute.QRILC <- function (dataSet.mvs, tune.sigma = 1) {
+  library(tmvtnorm)
   nFeatures = dim(dataSet.mvs)[1]
   nSamples = dim(dataSet.mvs)[2]
   dataSet.imputed = dataSet.mvs
