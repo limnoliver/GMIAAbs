@@ -66,6 +66,7 @@ df[,-1] <- scale(df[,-1])
 matIVs = as.matrix(df[,-1])
 colnames(matIVs) <- names(df)[-1]
 
-
+# run model
+mod <- run.caret.glmnet(matIVs, y)
 }
 
