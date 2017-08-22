@@ -17,6 +17,7 @@ predictors.keep <- names(predictors.all)[-drop.predictors]
 
 #df <- all.dat
 responses <- c('COD', 'BOD', 'DOC', 'Propylene_glycol', 'Acetate', 'Sodium', 'X4.Methyl.1H.Benzotriazole', 'X5.Methyl.1H.benzotriazole')
+responses.clean <- c('COD', 'BOD', 'DOC', 'Propylene glycol', 'Acetate', 'Sodium', '4-Methyl-1H-benzotriazole', '5-Methyl-1H-benzotriazole')
 predictors <- predictors.keep
 #left.censor.val = 0.5
 #right.censor.val = 2
