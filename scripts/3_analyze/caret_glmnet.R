@@ -19,14 +19,3 @@ mod <- train(matIVs, y,
 return(mod)
 
 }
-
-final.varimp <- varImp(mod)$importance[,1]
-
-# get coefficients from final model
-coefs.final <- coef(mod$finalModel, cM.all$bestTune$lambda)
-
-preds <- predict(cM.all)
-resids <- residuals(cM.all)
-plot(y~preds)
-abline(0,1,col = "red")
-abline(lm(y~preds), col = "blue")
