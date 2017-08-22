@@ -37,7 +37,9 @@ train.predict[[i]] <- data.frame(train.obs = y.train,
                                  train.pred = predict(mod))
 
 }
-return(tuning.pars, varimps, coefs, r2, rmse, hold.predict, train.predict)
+out <- list(tuning.pars, varimps, coefs, r2, rmse, hold.predict, train.predict)
+
+return(out)
 }
 
 
