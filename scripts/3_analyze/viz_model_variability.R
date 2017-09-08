@@ -11,9 +11,12 @@ devtools::source_gist("524eade46135f6348140", filename = "ggplot_smooth_func.R")
 # grab all alphas and lambdas from first run
 output <- data.frame(matrix(NA, nrow = 8, ncol = 6))
 names(output) <- c('alpha', 'lambda', 'rmse', 'r2.cv', 'r2.train', 'r2.test')
+coefs <- data.frame(matrix(NA, nrow = 15, ncol = 8))
+vars.keep <- list()
 
 for (i in 1:length(responses)){
   temp <- out[[i]]
+  response <- responses[i]
   # extract fit stats from first run
   output[i, 'alpha'] <- temp[[1]][[1]]$alpha
   output[i, 'lambda'] <- temp[[1]][[1]]$lambda
@@ -78,15 +81,15 @@ for (i in 1:length(responses)){
          width = 8, height = 4, dpi = 1200)
   
   # create dotplots
-  coefs <- temp[[3]]
+  coefs.dot <- temp[[3]]
   varimps <- temp[[2]]
-  temp.name <- paste('figures/holdout_coefs_dotplot_', responses[i], '.png', sep = '')
+  temp.name <- paste('figures/holdout_coefs.dot_dotplot_', responses[i], '.png', sep = '')
   png(temp.name, height = 500, width = 500)
   par(mar = c(5,5,1,1), oma = c(0,4,0,0), mfrow=c(1,2))
-  dotchart2(coefs$coef[2:15], labels = coefs$var.names[2:15], dotsize = 2, xlim = c(min(coefs[2:15, 2:11]),max(coefs[2:15, 2:11])), 
+  dotchart2(coefs.dot$coef[2:15], labels = coefs.dot$var.names[2:15], dotsize = 2, xlim = c(min(coefs.dot[2:15, 2:11]),max(coefs.dot[2:15, 2:11])), 
             xlab = "Coefficients", bty= "L",width.factor = .2, col = rgb(100,100,100,alpha = 100, maxColorValue = 255))
   for (j in 3:11) {
-    dotchart2(coefs[2:15,j], dotsize = 2, add = TRUE, col = rgb(100,100,100,alpha = 100, maxColorValue = 255))
+    dotchart2(coefs.dot[2:15,j], dotsize = 2, add = TRUE, col = rgb(100,100,100,alpha = 100, maxColorValue = 255))
   }
   dotchart2(varimps$imp, labels = '', dotsize = 2, xlim = c(-3,100), 
             xlab = "Variable Importance", bty= "L",width.factor = .2, col = rgb(100,100,100,alpha = 100, maxColorValue = 255))
@@ -94,11 +97,68 @@ for (i in 1:length(responses)){
     dotchart2(varimps[,j], dotsize = 2, add = TRUE, col = rgb(100,100,100,alpha = 100, maxColorValue = 255))
   }
   dev.off()
+  
+  # create a column in coefs.dot that sum the number of instances of zero
+  zeros <- function(x) {length(which(x == 0))} 
+  zeros.holdout <- apply(coefs.dot[,2:9], 1, zeros)
+  vars.keep[[i]] <- droplevels(coefs.dot$var.names[zeros.holdout == 0])
+  
+  # create table of coefficients by
+  # extracting coefficient estimates from 
+  if (i == 1){
+    coefs[,i] <- temp[[3]]$var.names
+    names(coefs)[1] <- 'Predictor Variables'
+  }
+  coefs[,i+1] <- temp[[3]]$coef
+  names(coefs)[i+1] <- responses.clean[i]
+  
+  # now itiratively remove vars and run linear model
+  # plot R2, RMSE by # of vars
+  zeros.holdout <- zeros.holdout[-1]
+  remove <- order(zeros.holdout, decreasing = TRUE) +1
+  file.names <- list.files('cached_data')
+  
+  # read in ready-to-model data
+  temp.search <- paste(response, '_model_dat', sep = '')
+  temp.files <- file.names[grep(temp.search, file.names)]
+  temp.loc <- paste('cached_data/', temp.files, sep = '')
+  temp.dat <- read.csv(temp.loc)
+  
+  mod.full <- summary(lm(y~., temp.dat))
+  mod.nvars <- data.frame(rse = mod.full$sigma, 
+                          r2 = mod.full$adj.r.squared, 
+                          nvars = 14)
+  for (j in 1:(length(remove)-1)){
+    remove.cols <- remove[1:j]
+    temp.dat.r <- temp.dat[, -remove.cols]
+    
+    mod.part <- summary(lm(y~., temp.dat.r))
+    nvar <- 14-j
+    rem <- as.character(names(temp.dat[remove[j]]))
+    mod.nvars[j+1, 1:3] <- c(mod.part$sigma, mod.part$adj.r.squared, nvar)
 
+  }
+  
+  mod.nvars$var_drop[2:14] <- names(temp.dat[,remove[1:13]])
+  temp.name <- paste('figures/mod_nvar_', response, '.png', sep = '')
+  png(temp.name)
+  par(mar=c(4,5,1,5))
+  plot(rse ~ nvars, mod.nvars, type = 'b', col = 'red', lwd = 2, ylab = 'Residual standard error', xlab = 'n Predictors')
+  par(new = TRUE)
+  plot(r2 ~ nvars, mod.nvars, type = 'b', col = 'blue', axes = F, bty = 'n', xlab = '', ylab = '')
+  axis(side = 4)
+  mtext("R2", side=4, line=3)
+  legend('right', legend = c('RSE', 'R2'), col = c('red', 'blue'), pch = 1, bty = 'n')
+  dev.off()
 }
 
 
+output$responses <- responses.clean
+output[,c(2:4)] <- round(output[,c(2:4)], 2)
+coefs[,c(2:9)] = round(coefs[,c(2:9)], 2)
 
+write.csv(output, 'cached_data/mod_performance.csv', row.names = F)
+write.csv(coefs, 'cached_data/mod_coefs.csv', row.names = F)
 library(Hmisc)
 
 
