@@ -78,8 +78,13 @@ for (i in 1:length(responses)) {
   matIVs = as.matrix(df[,-1])
   colnames(matIVs) <- names(df)[-1]
   
+  # write a csv of matIVs + y for later use if needed
+  temp <- cbind(y, matIVs)
+  names(temp)[1] <- response
+  temp.name <- paste('cached_data/', response, '_model_dat.csv', sep = '')
+  write.csv(temp, temp.name, row.names = FALSE)
   # run model
-  out[[i]] <- run.holdout(predictors = predictors, response = response, df = df)
+  #out[[i]] <- run.holdout(predictors = predictors, response = response, df = df)
   
   # now create outputs that we need
 }
