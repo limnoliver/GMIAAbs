@@ -37,6 +37,17 @@ train.predict[[i]] <- data.frame(train.obs = y.train,
                                  train.pred = predict(mod))
 
 }
+
+# mod.reduced <- cv.glmnet(matIVs, y, alpha = tuning.pars[[1]][[1]], nfolds = 5)
+# mod.reduced.noalpha <- cv.glmnet(matIVs, y, nfolds = 5)
+# 
+# #err.up <- mod$cvm + 2*mod$cvsd
+# #err.lo <- mod$cvm - 2*mod$cvsd
+# min.plus.error <- mod.reduced$cvm[which.min(mod.reduced$cvm)] + 2*mod.reduced$cvsd[which.min(mod.reduced$cvm)]
+# row.optim <- max(which(mod.reduced$cvm > min.plus.error))+1
+# lambda.optim <- mod.reduced$lambda[row.optim]
+# coef(mod.reduced, s = lambda.optim)
+
 out <- list(tuning.pars, varimps, coefs, r2, rmse, hold.predict, train.predict)
 
 return(out)
