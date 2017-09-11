@@ -2,12 +2,10 @@
 # preps responses for modeling
 
 all.dat <- read.csv('cached_data/filteredWQ_DOC_ABS.csv', stringsAsFactors = FALSE)
-responses <- c('COD', 'BOD', 'DOC', 'Propylene_glycol', 'Acetate', 'Sodium', 'X4.Methyl.1H.Benzotriazole', 'X5.Methyl.1H.benzotriazole', 
-           'Ethylene_glycol', 'Formate')
+responses <- c('COD', 'BOD', 'DOC', 'Propylene_glycol', 'Acetate', 'X4.Methyl.1H.Benzotriazole', 'X5.Methyl.1H.benzotriazole')
+responses.clean <- c('COD', 'BOD', 'DOC', 'Propylene glycol', 'Acetate', '4-Methyl-1H-benzotriazole', '5-Methyl-1H-benzotriazole')
 
 
-#responses <- all.dat[,c('COD', 'BOD', 'DOC', 'Propylene_glycol', 'Acetate', 'Sodium', 'X4.Methyl.1H.Benzotriazole', 'X5.Methyl.1H.benzotriazole', 
-                        'Ethylene_glycol', 'Formate')]
 r.responses <- paste('r', responses, sep = '')
 r.responses <- gsub('rX', 'r', r.responses)
 
@@ -36,14 +34,12 @@ for (i in 1:length(responses)){
   ys[[i]] <- y
 }
 
-means <- do.call(rbind, lapply(ys, function(x) round(mean(10^x), 0)))
-sds <- do.call(rbind, lapply(ys, function(x) round(sd(10^x), 0)))
-mins <- do.call(rbind, lapply(y_nodls, function(x) round(min(x, na.rm = TRUE), 1)))
-mins_censored <- do.call(rbind, lapply(ys, function(x) round(min(10^x), 1)))
-maxs <- do.call(rbind, lapply(ys, function(x) round(max(10^x), 0)))
+medians <- do.call(rbind, lapply(ys, function(x) round(median(10^x), 0)))
+tenth <- do.call(rbind, lapply(ys, function(x) round(quantile(10^x, 0.1), 0)))
+ninetieth <- do.call(rbind, lapply(ys, function(x) round(quantile(10^x, 0.9), 0)))
 
-sum.table <- data.frame(response = responses, 
+sum.table <- data.frame(response = responses.clean, 
                         nobs_ncensored = paste(n.obs, ' (', n.cens, ')', sep = ''),
-                        summary = paste(means, ' ± ', sds, ' (', mins_censored, ', ', mins, ', ', maxs, ')', sep = ''))
+                        summary = paste0(medians, ' (', tenth, ', ', ninetieth, ')'))
 
 write.csv(sum.table, 'figures/response_summary_table.csv', row.names = FALSE)
