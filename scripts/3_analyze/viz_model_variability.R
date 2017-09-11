@@ -4,14 +4,16 @@
 library(Hmisc)
 source('scripts/3_analyze/test_holdout.R')
 library(devtools)
-source_url('https://gist.github.com/kdauria/524eade46135f6348140')
+library(dplyr)
 
+source_url('https://gist.github.com/kdauria/524eade46135f6348140')
+#source('scripts/ana')
 devtools::source_gist("524eade46135f6348140", filename = "ggplot_smooth_func.R")
 
 # grab all alphas and lambdas from first run
-output <- data.frame(matrix(NA, nrow = 8, ncol = 6))
+output <- data.frame(matrix(NA, nrow = 7, ncol = 6))
 names(output) <- c('alpha', 'lambda', 'rmse', 'r2.cv', 'r2.train', 'r2.test')
-coefs <- data.frame(matrix(NA, nrow = 15, ncol = 8))
+coefs <- data.frame(matrix(NA, nrow = 15, ncol = 7))
 vars.keep <- list()
 
 for (i in 1:length(responses)){
@@ -36,18 +38,21 @@ for (i in 1:length(responses)){
   temp.x <- paste('log Predicted ', responses.clean[i], sep = '')
   temp.y <- paste('log Observed ', responses.clean[i], sep = '')
   
-  r2 <- function(y,x) {round(summary(lm(y~x))$r.squared,3)}
+  r2 <- function(y,x) {round(summary(lm(y~x))$r.squared,2)}
   
   r2.train <- train.dat %>%
     group_by(iteration) %>%
     summarise(r2.train = r2(train.obs,train.pred))
+  
+  r2.train <- r2.train %>%
+    mutate(r2.train.text = paste0('Run ', iteration, ' R2 = ', r2.train))
 
   train.dat <- merge(train.dat, r2.train, by = 'iteration')
   ggsave(temp.name, 
   ggplot(train.dat, aes(x = train.pred, y = train.obs)) +
-    geom_point(size = 2, shape = 16, color = 'darkgray') +
+    geom_point(size = 2, shape = 16, color = 'darkgray', alpha = 0.5) +
     geom_smooth(method = 'lm', formula = y~x) +
-    facet_wrap(~ r2.train, scales = 'fixed', nrow = 2) +
+    facet_wrap(~ r2.train.text, scales = 'fixed', nrow = 2) +
     #geom_text(data = r2.text, aes(label = labels)) +
     theme_bw() +
     theme(strip.background = element_blank(), 
@@ -65,12 +70,15 @@ for (i in 1:length(responses)){
     group_by(iteration) %>%
     summarise(r2.test = r2(hold.obs,hold.pred))
   
+  r2.test <- r2.test %>%
+    mutate(r2.test.text = paste0('Run ', iteration, ' R2 = ', r2.test))
+  
   test.dat <- merge(test.dat, r2.test, by = 'iteration')
   ggsave(temp.name, 
          ggplot(test.dat, aes(x = hold.pred, y = hold.obs)) +
-           geom_point(size = 2, shape = 16, color = 'darkgray') +
+           geom_point(size = 2, shape = 16, color = 'darkgray', alpha = 0.5) +
            geom_smooth(method = 'lm', formula = y~x) +
-           facet_wrap(~ r2.test, scales = 'fixed', nrow = 2) +
+           facet_wrap(~ r2.test.text, scales = 'fixed', nrow = 2) +
            #geom_text(data = r2.text, aes(label = labels)) +
            theme_bw() +
            theme(strip.background = element_blank(), 
@@ -112,50 +120,70 @@ for (i in 1:length(responses)){
   coefs[,i+1] <- temp[[3]]$coef
   names(coefs)[i+1] <- responses.clean[i]
   
-  # now itiratively remove vars and run linear model
+  # now itiratively remove vars 
+  # and run linear model [change to elastic net]
   # plot R2, RMSE by # of vars
-  zeros.holdout <- zeros.holdout[-1]
-  remove <- order(zeros.holdout, decreasing = TRUE) +1
-  file.names <- list.files('cached_data')
   
-  # read in ready-to-model data
-  temp.search <- paste(response, '_model_dat', sep = '')
-  temp.files <- file.names[grep(temp.search, file.names)]
-  temp.loc <- paste('cached_data/', temp.files, sep = '')
-  temp.dat <- read.csv(temp.loc)
+  # zeros.holdout <- zeros.holdout[-1]
+  # remove <- order(zeros.holdout, decreasing = TRUE) +1
+  # file.names <- list.files('cached_data')
+  # 
+  # # read in ready-to-model data
+  # temp.search <- paste(response, '_model_dat', sep = '')
+  # temp.files <- file.names[grep(temp.search, file.names)]
+  # temp.loc <- paste('cached_data/', temp.files, sep = '')
+  # temp.dat <- read.csv(temp.loc)
+  # 
+  # # create matrix for predictor vars
+  # matIVs = as.matrix(temp.dat[,-1])
+  # colnames(matIVs) <- names(temp.dat)[-1]
+  # y <- temp.dat[,1]
+  # mod <- cv.glmnet(matIVs, y)
+  # 
+  # #err.up <- mod$cvm + 2*mod$cvsd
+  # #err.lo <- mod$cvm - 2*mod$cvsd
+  # 
+  # min.plus.error <- mod$cvm[which.min(mod$cvm)] + 2*mod$cvsd[which.min(mod$cvm)]
+  # row.optim <- max(which(mod$cvm > min.plus.error))+1
+  # lambda.optim <- mod$lambda[row.optim]
+  # coef(mod, s = lambda.optim)
+  # result.row <- which(mod$results$lambda==mod$bestTune$lambda & mod$results$alpha == mod$bestTune$alpha)
+  # 
+  # mod.nvars <- data.frame(rmse = mod$results$RMSE[result.row], 
+  #                         r2 = mod$results$Rsquared[result.row], 
+  #                         nvars = 14)
+  # 
+  # for (j in 1:(length(remove)-1)){
+  #   remove.cols <- remove[1:j]
+  #   temp.dat.r <- temp.dat[, -remove.cols]
+  #   matIVs = as.matrix(temp.dat.r[,-1])
+  #   colnames(matIVs) <- names(temp.dat.r)[-1]
+  #   y <- temp.dat.r[,1]
+  #   mod.part <- run.caret.glmnet(matIVs, y)
+  #   result.row <- which(mod.part$results$lambda==mod.part$bestTune$lambda & mod.part$results$alpha == mod.part$bestTune$alpha)
+  #   nvar <- 14-j
+  #   #rem <- as.character(names(temp.dat[remove[j]]))
+  #   mod.nvars[j+1, 1:3] <- c(mod.part$results$RMSE[result.row], mod.part$results$Rsquared[result.row], nvar)
+  # 
+  # }
   
-  mod.full <- summary(lm(y~., temp.dat))
-  mod.nvars <- data.frame(rse = mod.full$sigma, 
-                          r2 = mod.full$adj.r.squared, 
-                          nvars = 14)
-  for (j in 1:(length(remove)-1)){
-    remove.cols <- remove[1:j]
-    temp.dat.r <- temp.dat[, -remove.cols]
-    
-    mod.part <- summary(lm(y~., temp.dat.r))
-    nvar <- 14-j
-    rem <- as.character(names(temp.dat[remove[j]]))
-    mod.nvars[j+1, 1:3] <- c(mod.part$sigma, mod.part$adj.r.squared, nvar)
-
-  }
-  
-  mod.nvars$var_drop[2:14] <- names(temp.dat[,remove[1:13]])
-  temp.name <- paste('figures/mod_nvar_', response, '.png', sep = '')
-  png(temp.name)
-  par(mar=c(4,5,1,5))
-  plot(rse ~ nvars, mod.nvars, type = 'b', col = 'red', lwd = 2, ylab = 'Residual standard error', xlab = 'n Predictors')
-  par(new = TRUE)
-  plot(r2 ~ nvars, mod.nvars, type = 'b', col = 'blue', axes = F, bty = 'n', xlab = '', ylab = '')
-  axis(side = 4)
-  mtext("R2", side=4, line=3)
-  legend('right', legend = c('RSE', 'R2'), col = c('red', 'blue'), pch = 1, bty = 'n')
-  dev.off()
+  # mod.nvars$var_drop[2:14] <- names(temp.dat[,remove[1:13]])
+  # temp.name <- paste('figures/mod_nvar_', response, '.png', sep = '')
+  # png(temp.name)
+  # par(mar=c(4,5,1,5))
+  # plot(rmse ~ nvars, mod.nvars, type = 'b', col = 'red', lwd = 2, ylab = 'Residual standard error', xlab = 'n Predictors')
+  # par(new = TRUE)
+  # plot(r2 ~ nvars, mod.nvars, type = 'b', col = 'blue', axes = F, bty = 'n', xlab = '', ylab = '')
+  # axis(side = 4)
+  # mtext("R2", side=4, line=3)
+  # legend('right', legend = c('RSE', 'R2'), col = c('red', 'blue'), pch = 1, bty = 'n')
+  # dev.off()
 }
 
 
 output$responses <- responses.clean
 output[,c(2:4)] <- round(output[,c(2:4)], 2)
-coefs[,c(2:9)] = round(coefs[,c(2:9)], 2)
+coefs[,c(2:8)] = round(coefs[,c(2:8)], 2)
 
 write.csv(output, 'cached_data/mod_performance.csv', row.names = F)
 write.csv(coefs, 'cached_data/mod_coefs.csv', row.names = F)
