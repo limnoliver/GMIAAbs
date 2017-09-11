@@ -4,7 +4,7 @@ library(caret)
 run.caret.glmnet <- function(matIVs, y) {
 
 # run all 10 within caret
-
+tolerance2 <- tolerance(x, metric, tol = 5, maximize = FALSE)
 ctrl <- trainControl(method = 'repeatedcv',
                      number = 5,
                      repeats = 10, 
@@ -19,3 +19,5 @@ mod <- train(matIVs, y,
 return(mod)
 
 }
+
+mod2 <- cv.glmnet(matIVs, y)
