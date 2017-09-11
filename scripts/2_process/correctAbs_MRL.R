@@ -64,7 +64,7 @@ abs.corrected.t <- merge(abs.corrected.t, storms, by = 'GRnumber', all.x = TRUE)
 
 write.csv(abs.corrected[[1]],'cached_data/correctedAbsData.csv',row.names = FALSE)
 write.csv(abs.corrected.t, 'cached_data/tcorrectedAbsData.csv', row.names = FALSE)
-write.csv(test, 'cached_data/censoredAbs', row.names = FALSE)
+write.csv(test, 'cached_data/censoredAbs.csv', row.names = FALSE)
 
 png('figures/Abs_prop_censored.png')
 plot(prop_censored~Wavelength, data = abs.censored, ylab = "Proportion of Samples < MDL", cex.lab = 1.3)
