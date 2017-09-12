@@ -10,8 +10,12 @@ sites.remove <- grep('US|LK|OAK', all.dat$ProjectID)
 # get rid of US events
 filt.dat <- all.dat[-sites.remove, ]
 
+# get rid of data that has no response vars
+incomplete <- which(is.na(filt.dat$COD)&is.na(filt.dat$BOD)&is.na(filt.dat$Propylene_glycol)&is.na(filt.dat$DOC))
+filt.dat <- filt.dat[-incomplete, ]
+
 # ID summer events
-month <- substr(filt.dat$date, start = 5, stop = 6)
+month <- substr(filt.dat$Start_Date, start = 6, stop = 7)
 summer.rows <- grep('05|06|07|08|09|10', month)
 
 # get rid of summer events
