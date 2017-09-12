@@ -1,3 +1,4 @@
+library(readxl)
 dat.all <- read.csv('cached_data/mergedWQ_DOC_ABS.csv')
 all.dat <- dat.all
 # find missing COD data (should have the WQ samples)
