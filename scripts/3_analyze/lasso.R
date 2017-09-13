@@ -5,7 +5,7 @@ library(caret)
 
 source('scripts/2_process/fxn_imputeQRILC.R')
 source('scripts/3_analyze/caret_glmnet.R')
-source('scripts/3_analyze/test_holdout.R')
+source('scripts/3_analyze/holdout_cv_glmnet.R')
 # get data
 all.dat <- read.csv('cached_data/filteredWQ_DOC_ABS.csv', stringsAsFactors = FALSE)
 all.dat$rDOC <- NA
@@ -40,7 +40,9 @@ for (i in 1:length(responses)) {
   y <- all.dat[, response]
   na.vals <- which(is.na(y))
   y[rows.left] <- NA
-  y <- y[-na.vals]
+  if(length(na.vals)>0){
+    y <- y[-na.vals]
+  }
   y <- log(y)
 
   # impute values from distribution
