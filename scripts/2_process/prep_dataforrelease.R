@@ -57,4 +57,9 @@ df.pub <- select(df.pub, site, start_date, end_date, variable, value, censored, 
 df.pub$variable <- as.factor(df.pub$variable)
 levels(df.pub$variable)[104:105] <- c('4_Methyl_1H_Benzotriazole', '5_Methyl_1H_Benzotriazole')
 
+# drop all rows where value is NA
+
+df.pub <- df.pub %>%
+  filter(!is.na(value))
+
 write.csv(df.pub, 'cached_data/airport_data_for_sb.csv', row.names = FALSE)
