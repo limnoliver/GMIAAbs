@@ -82,7 +82,7 @@ run.holdout <- function(predictors, response, df) {
   # coef(mod.reduced, s = lambda.optim)
   
   out <- list(coefs, r2.1se, r2.2se, final.r2, 
-              mse.1se, mse.2se, final.mse, df.1se, df.2se, mean(lambda.2se))
+              mse.1se, mse.2se, final.mse, df.1se, df.2se, mean(lambda.2se), pred.df)
   
   return(out)
 }
