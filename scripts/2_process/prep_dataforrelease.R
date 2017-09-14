@@ -1,3 +1,5 @@
+library(dplyr)
+library(tidyr)
 # script to get data in format for data release
 
 df <- read.csv('cached_data/filteredWQ_DOC_ABS.csv')
