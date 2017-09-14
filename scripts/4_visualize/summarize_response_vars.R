@@ -23,9 +23,18 @@ for (i in 1:length(responses)){
   y <- all.dat[, responses[i]]
   rows.left <- which(all.dat[,r.responses[i]]=="<")
   na.vals <- which(is.na(y))
-  y_nodls[[i]] <- y[c(-rows.left, -na.vals)]
+  discard <- c(rows.left, na.vals)
+  if (length(discard)>0){
+    y_nodls[[i]] <- y[-discard]
+    
+  }
   y[rows.left] <- NA
-  y <- y[-na.vals]
+  
+  if (length(na.vals)>0){
+    y <- y[-na.vals]
+    
+  }
+  
   y <- log10(y)
   # impute values from distribution
   if (length(rows.left)>0){
