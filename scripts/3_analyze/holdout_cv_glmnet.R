@@ -69,6 +69,8 @@ run.holdout <- function(predictors, response, df) {
   final.predict <- predict(mod.final, matIVs)
   final.mse <- mean((y - final.predict)^2)
   final.r2 <- mod.final$dev.ratio
+  pred.df <- data.frame(observed = y,
+                        predicted = final.predict)
   # mod.reduced <- cv.glmnet(matIVs, y, alpha = tuning.pars[[1]][[1]], nfolds = 5)
   # mod.reduced.noalpha <- cv.glmnet(matIVs, y, nfolds = 5)
   # 
