@@ -6,14 +6,23 @@ deicers <- read.csv('raw_data/DeicerAbs.csv')
 deicers_ids <- c('Group003GMIA0004', 'Group003GMIA0005')
 location <- "//igsarmewwshg8/HG8Data/Aqualog/AquaLog_Data/2017/20170127/"
 
+# get type I deicer measured in 2017
 all.files <- list.files(path = location)
 file1 <- all.files[grep(paste0(deicers_ids[1], 'ABS.dat'), all.files)]
 deicer_2017_1 <- read.table(paste(location, file1, sep = '/'), header = FALSE)
 names(deicer_2017_1) <- c('Wavelength', 'CPP-I_')
 
+# correct for dilution factor which is 20
+
+deicer_2017_1$`CPP-I_` <- deicer_2017_1$`CPP-I_`*20
+
+# get type IV deicer measured in 2017
 file2 <- all.files[grep(paste0(deicers_ids[2], 'ABS.dat'), all.files)]
 deicer_2017_2 <- read.table(paste(location, file2, sep = '/'), header = FALSE)
 names(deicer_2017_2) <- c('Wavelength', 'CPGA-IV_')
+
+# correct for dilution factor which is 50
+deicer_2017_2$`CPGA-IV_` <- deicer_2017_2$`CPGA-IV_`*50
 
 deicers <- merge(deicers, deicer_2017_1, all.x = TRUE)
 deicers <- merge(deicers, deicer_2017_2, all.x = TRUE)
