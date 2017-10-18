@@ -1,6 +1,6 @@
 # this script cleans up DOC data
 
-doc.raw <- read.csv('raw_data/rawDOCdata.csv')
+doc.raw <- read.csv('raw_data/rawDOCdata.csv', stringsAsFactors = F)
 
 # get sample ids from absorbance data to ID samples we want to keep
 sample.ids <- read.csv('cached_data/absSlopesResiduals.csv')
@@ -40,9 +40,9 @@ doc.unique2 <- doc.unique[-reps, ]
 
 # to avoid processing samples that we won't keep,
 # get rid of rows that do not have a project ID that is shared by absorbance data
-doc.unique2$ProjectID <- gsub("-", ".", doc.unique2$ProjectID)
-dat.keep <- which(doc.unique2$ProjectID %in% sample.ids)
-doc.unique2 <- doc.unique2[dat.keep, ]
+#doc.unique2$ProjectID <- gsub("-", ".", doc.unique2$ProjectID)
+#dat.keep <- which(doc.unique2$ProjectID %in% sample.ids)
+#doc.unique2 <- doc.unique2[dat.keep, ]
 # first, have to format dates properly
 new.dates <- c()
 for (i in 1:length(doc.unique2$Date)){
@@ -65,17 +65,20 @@ for (i in 1:length(doc.unique2$Date)){
 } 
 
 doc.unique2$Date_formatted <- new.dates
+doc.unique2 <- doc.unique2[,-4]
+doc.unique2 <- unique(doc.unique2)
 
 sample.log <- read_xlsx('M:/NonPoint Evaluation/gmia/SLOH labforms and budget/optics.sample.log.ALL.xlsx')
 sample.log <- as.data.frame(sample.log[,c(2,6)])
 names(sample.log) <- c('ProjectID', 'KeepDate')
-sample.log$ProjectID <- gsub("-", ".", sample.log$ProjectID)
+#sample.log$ProjectID <- gsub("-", ".", sample.log$ProjectID)
 
-doc.unique3 <- merge(doc.unique2, sample.log, by = "ProjectID", all.x = TRUE)
+doc.unique3 <- merge(doc.unique2, sample.log, by = 'ProjectID', all.x = TRUE)
+doc.unique3 <- filter(doc.unique3, !is.na(KeepDate))
 
 for (i in 1:nrow(doc.unique3)){
   if (is.na(doc.unique3$Keep[i])){
-    if (doc.unique3$Date_formatted[i] == doc.unique3$KeepDate[i]){
+    if (doc.unique3$Date_formatted[i] %in% doc.unique3$KeepDate[i]){
       doc.unique3$Keep[i] = 1
     } else {
       doc.unique3$Keep[i] = 0
@@ -85,6 +88,7 @@ for (i in 1:nrow(doc.unique3)){
 
 doc.unique3 <- subset(doc.unique3, doc.unique3$Keep == 1)
 
-doc.unique3 <- doc.unique3[,c('ProjectID', 'DOC', 'Date', 'Date_formatted')]
+doc.unique3 <- doc.unique3[,c('ProjectID', 'DOC', 'Date_formatted')]
+doc.unique3$ProjectID <- gsub("-", ".", doc.unique3$ProjectID)
  
 write.csv(doc.unique3, 'cached_data/cleanedDOCdata.csv', row.names = FALSE)
