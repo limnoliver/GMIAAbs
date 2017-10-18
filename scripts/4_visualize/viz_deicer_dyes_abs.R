@@ -6,6 +6,10 @@ deicers <- read.csv('raw_data/DeicerAbs.csv')
 deicers_ids <- c('Group003GMIA0004', 'Group003GMIA0005')
 location <- "//igsarmewwshg8/HG8Data/Aqualog/AquaLog_Data/2017/20170127/"
 
+# correct dyes, which were diluted to 5% dye, so correct by *20
+
+dyes[,2:5] <- 20*dyes[,2:5]
+
 # get type I deicer measured in 2017
 all.files <- list.files(path = location)
 file1 <- all.files[grep(paste0(deicers_ids[1], 'ABS.dat'), all.files)]
@@ -79,7 +83,7 @@ plot(dyes[,2]~dyes$Wavelength, type = 'l', lwd = 2, ylim = dyes.axes, col = dyes
 for(i in 3:5){
   points(dyes[,i]~dyes$Wavelength, type = "l", lwd = 2, col = dyes.col[i-1])
 }
-legend(x = 280, y = 0.131, legend = c('Orange II', 'Sunset Yellow', 'Tartrazine', 'Erioglycine'),col = dyes.col, lwd = 2, 
+legend(x = 280, y = 0.131*20, legend = c('Orange II', 'Sunset Yellow', 'Tartrazine', 'Erioglycine'),col = dyes.col, lwd = 2, 
        title = 'Dyes')
 
 dev.off()
