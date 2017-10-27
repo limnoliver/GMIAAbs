@@ -4,12 +4,7 @@
 
 all.dat <- read.csv('cached_data/mergedWQ_DOC_ABS.csv', stringsAsFactors = FALSE)
 
-# ID upstream events
-sites.remove <- grep('US|LK|OAK', all.dat$ProjectID)
-
-# get rid of US events
-filt.dat <- all.dat[-sites.remove, ]
-
+filt.dat <- all.dat
 # get rid of data that has no response vars
 incomplete <- which(is.na(filt.dat$COD)&is.na(filt.dat$BOD)&is.na(filt.dat$Propylene_glycol)&is.na(filt.dat$DOC))
 filt.dat <- filt.dat[-incomplete, ]
@@ -36,6 +31,16 @@ out <- c('Sag506_530', 'Sag530_551', 'Sag551_611', 'Sag611_650', 'Resids629')
 out.cols <- which(names(filt.dat) %in% out)
 
 filt.dat <- filt.dat[,-out.cols]
+
+# write a csv of all sites with appropriate filters
+write.csv(filt.dat, 'cached_data/filteredWQ_DOC_ABS_allsites.csv', row.names = F)
+
+# ID upstream events
+sites.remove <- grep('US|LK|OAK', filt.dat$ProjectID)
+
+# get rid of US events
+filt.dat <- all.dat[-sites.remove, ]
+
 
 write.csv(filt.dat, 'cached_data/filteredWQ_DOC_ABS.csv', row.names = FALSE)
 
