@@ -91,6 +91,7 @@ for (i in 1:length(responses)) {
   # now create outputs that we need
 }
 
+saveRDS(out, 'cached_data/model_out.rds')
 
 
 
