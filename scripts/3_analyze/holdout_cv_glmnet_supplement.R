@@ -1,6 +1,6 @@
 # run cv.glmnet over different hold out testing sets
 
-run.holdout <- function(predictors, response, df) {
+run.holdout.supp <- function(predictors, response, df) {
   #tuning.pars <- list()
   #varimps <- data.frame(var.names = predictors, imp = NA)
   coefs <- data.frame(var.names = c('intercept', predictors), coef = NA)
