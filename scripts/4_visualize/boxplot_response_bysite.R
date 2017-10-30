@@ -93,17 +93,6 @@ p <- ggplot(filt.dat.long, aes(site, log10(value))) +
   labs(x = '', y = 'Concentration (mg/L)') +
   scale_y_continuous(labels = scales::math_format(expr = 10^.x, format = force))
 
-ggsave('figures/response_by_site.png', p, height = 4, width = 9)
+ggsave('figures/response_by_site.png', p, height = 5, width = 12)
 
 
-png('figures/response_by_site.png')
-layout(matrix(1:8, nrow = 4, ncol = 2))
-par(mar=c(4,5,1,1.5))
-for (i in 1:length(responses)){
-  
-  boxplot(log10(filt.dat[,responses[i]])~filt.dat$site,
-          ylab = paste0('log ', responses.clean[i]), cex.lab = 1.4, cex.axis = 1.2)
-  
-  
-}
-dev.off()
