@@ -9,49 +9,50 @@ library(caret)
 
 source('scripts/2_process/fxn_imputeQRILC.R')
 #source('scripts/3_analyze/caret_glmnet.R')
-source('scripts/3_analyze/holdout_cv_glmnet.R')
+source('scripts/3_analyze/holdout_cv_glmnet_supplement.R')
 # get data
 all.dat <- read.csv('cached_data/filteredWQ_DOC_ABS_allsites.csv', stringsAsFactors = FALSE)
 all.dat$rDOC <- NA
 responses <- c('COD', 'BOD', 'DOC', 'Propylene_glycol', 'Acetate', 'X4.Methyl.1H.Benzotriazole', 'X5.Methyl.1H.benzotriazole')
 responses.clean <- c('COD', 'BOD', 'DOC', 'Propylene glycol', 'Acetate', '4-Methyl-1H-benzotriazole', '5-Methyl-1H-benzotriazole')
+site_ids <- c('CG', 'OUT', 'OAK', 'LK')
 
+# remove variables that are highly correlated
+predictors.temp <- all.dat[,c(3:100)]
+#predictors.cor <- cor(predictors.temp)
+#drop.predictors <- findCorrelation(predictors.cor, cutoff = 0.99, verbose = FALSE, exact = TRUE)
+#predictors.keep <- names(predictors.temp)[-drop.predictors]
+#predictors <- predictors.keep
+predictors <- names(predictors.temp)
 
+# get list of ouput
+out <- list()
 
-sites <- c('CG', 'OUT', 'OAK', 'US', 'LK')
-
-for (i in sites) {
-  temp.dat <- all.dat[grep(sites[i], all.dat$ProjectID), ]
-  # remove variables that are highly correlated
-  predictors.temp <- temp.dat[,c(3:100)]
-  predictors.cor <- cor(predictors.temp)
-  drop.predictors <- findCorrelation(predictors.cor, cutoff = 0.99, verbose = FALSE, exact = TRUE)
-  predictors.keep <- names(predictors.temp)[-drop.predictors]
+for (i in 1:length(site_ids)) {
+  temp.dat <- all.dat[grep(site_ids[i], all.dat$ProjectID), ]
 
   
   #df <- all.dat
-  predictors <- predictors.keep
   #left.censor.val = 0.5
   #right.censor.val = 2
   
-  # get list of ouput
-  out <- list()
   for (j in 1:length(responses)) {
     response <- responses[j]
     # find out if variable is censored
     remarks <- paste('r', response, sep = '')
     remarks <- gsub('rX', 'r', remarks)
     
-    rows.left <- which(all.dat[,remarks]=="<")
+    rows.left <- which(temp.dat[,remarks]=="<")
     #rows.right <- which(df[,remarks]=='>')
     
     # impute censored values by assuming a log-normal distribution
     # first, get red of real missing values, and set 
     # censored values to NA
     
-    y <- all.dat[, response]
+    y <- temp.dat[, response]
     na.vals <- which(is.na(y))
     y[rows.left] <- NA
+    
     if(length(na.vals)>0){
       y <- y[-na.vals]
     }
@@ -68,7 +69,7 @@ for (i in sites) {
     }
     
     
-    df <- all.dat
+    df <- temp.dat
     
     # reduce df to just response (first col) and predictors
     storms <- df$ProjectID
@@ -96,15 +97,17 @@ for (i in sites) {
     temp <- cbind(y, matIVs)
     names(temp)[1] <- response
     temp.name <- paste('cached_data/', response, '_model_dat.csv', sep = '')
-    write.csv(temp, temp.name, row.names = FALSE)
-    # run model
-    out[[j]] <- run.holdout(predictors = predictors, response = response, df = df)
     
-    # now create outputs that we need
+    #write.csv(temp, temp.name, row.names = FALSE)
+    # run model
+    out[[1+length(out)]] <- run.holdout.supp(predictors = predictors, response = response, df = df)
+    names(out)[length(out)] <- paste0(site_ids[i], "_", response)
+    
+    
   }
 }
 
-saveRDS(out, 'cached_data/model_out.rds')
+saveRDS(out, 'cached_data/model_out_supplement.rds')
 
 
 
