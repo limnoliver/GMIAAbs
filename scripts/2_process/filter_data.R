@@ -36,10 +36,10 @@ filt.dat <- filt.dat[,-out.cols]
 write.csv(filt.dat, 'cached_data/filteredWQ_DOC_ABS_allsites.csv', row.names = F)
 
 # ID upstream events
-sites.remove <- grep('US', filt.dat$ProjectID)
+sites.remove <- grep('^US', filt.dat$ProjectID)
 
 # get rid of US events
-filt.dat <- all.dat[-sites.remove, ]
+filt.dat <- filt.dat[-sites.remove, ]
 
 # combine airport sites (OUT and CG) and downstream sites (OAK and LK)
 filt.dat$site_group <- "downstream"
