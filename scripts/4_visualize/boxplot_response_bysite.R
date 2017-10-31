@@ -74,12 +74,15 @@ n_fun <- function(x){
   return(data.frame(y = ifelse(max(x) > 2, max(x) + (.08*max(x)), max(x) + (.25*max(x))), label = length(x)))
 }
 
+# change site names to include units for facet labels
+mu.symbol <- '\U00B5'
+levels(filt.dat.long$variable) <- paste(levels(filt.dat.long$variable), c(rep('(mg/L)', 5), rep(paste0("(",  mu.symbol, "g/L)"), 2)))
+
 n.cens <- filt.dat.long %>%
   group_by(variable, site) %>%
   summarize(n.cens = sum(censored), n = length(value), y = ifelse(max(log10(value)) > 2.2, max(log10(value)) + (.08*max(log10(value))), max(log10(value)) + (.25*max(log10(value))))) %>%
   mutate(label = ifelse(n.cens > 0, paste0(n, ' (', n.cens, ')'), paste0(n)))
 
-  
 
 p <- ggplot(filt.dat.long, aes(site, log10(value))) +
   geom_boxplot() + 
@@ -89,8 +92,11 @@ p <- ggplot(filt.dat.long, aes(site, log10(value))) +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         strip.background = element_blank(),
-        panel.border = element_rect(colour = "black")) +
-  labs(x = '', y = 'Concentration (mg/L)') +
+        panel.border = element_rect(colour = "black"),
+        axis.text = element_text(size = 12), 
+        axis.title = element_text(size = 14),
+        strip.text = element_text(size = 12)) +
+  labs(x = '', y = 'Concentration') +
   scale_y_continuous(labels = scales::math_format(expr = 10^.x, format = force))
 
 ggsave('figures/response_by_site.png', p, height = 5, width = 12)
