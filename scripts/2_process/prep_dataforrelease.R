@@ -2,7 +2,7 @@ library(dplyr)
 library(tidyr)
 # script to get data in format for data release
 
-df <- read.csv('cached_data/filteredWQ_DOC_ABS.csv')
+df <- read.csv('cached_data/filteredWQ_DOC_ABS_allsites.csv')
 df.abs.r <- read.csv('cached_data/censoredAbs.csv')
 
 # make absorbance remarks data frame into long format
@@ -48,6 +48,8 @@ units.df <- data.frame(variable = vars,
 df.all <- left_join(df.all, units.df)
 
 df.all$site <- substr(df.all$ProjectID, 1, 2)
+df.all$site <- as.factor(df.all$site)
+levels(df.all$site) <- c("CG", "LK", "OAK", "OUT", "UP")
 
 df.pub <- df.all %>%
   select(-GRnumber, -ProjectID) %>%
@@ -63,3 +65,9 @@ df.pub <- df.pub %>%
   filter(!is.na(value))
 
 write.csv(df.pub, 'cached_data/airport_data_for_sb.csv', row.names = FALSE)
+
+map <- get_map()
+
+ggmap(map) +
+  coord_map(projection)
+
