@@ -2,15 +2,14 @@
 # when randomly withholding 20% of data
 
 library(Hmisc)
-source('scripts/3_analyze/test_holdout.R')
 library(devtools)
 library(dplyr)
 
-source_url('https://gist.github.com/kdauria/524eade46135f6348140')
+#source_url('https://gist.github.com/kdauria/524eade46135f6348140')
 #source('scripts/ana')
-devtools::source_gist("524eade46135f6348140", filename = "ggplot_smooth_func.R")
+#devtools::source_gist("524eade46135f6348140", filename = "ggplot_smooth_func.R")
 
-
+out <- readRDS('cached_data/model_out.rds')
 
 # set responses
 responses <- c('COD', 'BOD', 'DOC', 'Propylene_glycol', 'Acetate', 'X4.Methyl.1H.Benzotriazole', 'X5.Methyl.1H.benzotriazole')
@@ -24,15 +23,20 @@ for (group in c("airport", "downstream")) {
   
   # grab all alphas and lambdas from first run
   # create blank output dataframes
+  
+  # first find expected dimensions based on the number of predictor
+  # variables that were included in the model
+  
+  var.n <- nrow(out_sub[[1]][[1]])
   output <- data.frame(matrix(NA, nrow = 7, ncol = 3))
   names(output) <- c('lambda', 'mse', 'r2')
   output2 <- data.frame(matrix(NA, nrow = 7, ncol = 6))
   names(output2) <- c('df_1se', 'df_2se', 'mse_1se', 'mse_2se', 'r2_1se', 'r2_2se')
-  coefs_df_stand <- data.frame(matrix(NA, nrow = 15, ncol = 7))
-  coefs_df_unstand <- data.frame(matrix(NA, nrow = 15, ncol = 7))
-  supp.table <- data.frame(matrix(NA, nrow = 15, ncol = 7))
+  coefs_df_stand <- data.frame(matrix(NA, nrow = var.n, ncol = 7))
+  coefs_df_unstand <- data.frame(matrix(NA, nrow = var.n, ncol = 7))
+  supp.table <- data.frame(matrix(NA, nrow = var.n, ncol = 7))
   
-  var.counts <- data.frame(matrix(NA, nrow = 15, ncol = 7))
+  var.counts <- data.frame(matrix(NA, nrow = var.n, ncol = 7))
   pred_obs <- data.frame(matrix(NA, nrow = 1, ncol = 2))
   names(pred_obs) <- c('observed', 's0')
   
@@ -64,14 +68,15 @@ for (group in c("airport", "downstream")) {
     supp.table[,i] <- paste0(round(coefs_df_unstand[,i], 1), ' (', zeros.holdout, ')')
     
   }
-  supp.table[16:21,] <- t(output2)
+  
+  supp.table[(nrow(supp.table)+1):(nrow(supp.table)+6),] <- t(output2)
   names(supp.table) <- responses.clean 
   supp.table$variable <- c(as.character(temp[[1]]$var.names), names(output2))
   supp.table <- supp.table[,c(8, 1:7)]
   
   coef.table <- round(coefs_df_stand, 2)
   names(coef.table) <- responses.clean
-  coef.table[16:18, ] <- t(round(output, 2))
+  coef.table[(nrow(coef.table)+1):(nrow(coef.table)+3), ] <- t(round(output, 2))
   coef.table$variable <- c(as.character(temp[[1]]$var.names), names(output))
   coef.table <- coef.table[,c(8, 1:7)]
   
