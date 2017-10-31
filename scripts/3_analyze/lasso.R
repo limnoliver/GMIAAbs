@@ -87,13 +87,13 @@ for (group in c("airport", "downstream")) {
     colnames(matIVs) <- names(df)[-1]
     
     # write a csv of matIVs + y for later use if needed
-    temp <- cbind(y, matIVs)
-    names(temp)[1] <- response
-    temp.name <- paste('cached_data/', response, '_model_dat.csv', sep = '')
-    write.csv(temp, temp.name, row.names = FALSE)
+    # temp <- cbind(y, matIVs)
+    # names(temp)[1] <- response
+    # temp.name <- paste('cached_data/', response, '_model_dat.csv', sep = '')
+    # #write.csv(temp, temp.name, row.names = FALSE)
     # run model
-    out[[length(out)]] <- run.holdout(predictors = predictors, response = response, df = df)
-    
+    out[[length(out)+1]] <- run.holdout(predictors = predictors, response = response, df = df)
+    names(out)[length(out)] <- paste(group, response, sep = "_")
     # now create outputs that we need
   }
 }
