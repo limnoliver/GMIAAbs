@@ -1,9 +1,11 @@
+library(readxl)
+library(dplyr)
 # this script cleans up DOC data
 
 doc.raw <- read.csv('raw_data/rawDOCdata.csv', stringsAsFactors = F)
 
 # get sample ids from absorbance data to ID samples we want to keep
-sample.ids <- read.csv('cached_data/absSlopesResiduals.csv')
+sample.ids <- read.csv('cached_data/tcorrectedAbsData.csv')
 sample.ids <- sample.ids$ProjectID
 
 # identify QA rows from 'ProjectID' column
