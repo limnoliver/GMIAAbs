@@ -66,8 +66,5 @@ df.pub <- df.pub %>%
 
 write.csv(df.pub, 'cached_data/airport_data_for_sb.csv', row.names = FALSE)
 
-map <- get_map()
 
-ggmap(map) +
-  coord_map(projection)
 
