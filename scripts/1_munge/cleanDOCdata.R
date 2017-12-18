@@ -92,5 +92,10 @@ doc.unique3 <- subset(doc.unique3, doc.unique3$Keep == 1)
 
 doc.unique3 <- doc.unique3[,c('ProjectID', 'DOC', 'Date_formatted')]
 doc.unique3$ProjectID <- gsub("-", ".", doc.unique3$ProjectID)
- 
+
+# manually get rid of US.S111G where value = 65
+# this is a duplicate value that was not filtered out of 
+# 20141202 file
+
+doc.unique3 <- subset(doc.unique3, !(doc.unique3$ProjectID == "US.S111G" & doc.unique3$DOC == 65))
 write.csv(doc.unique3, 'cached_data/cleanedDOCdata.csv', row.names = FALSE)
