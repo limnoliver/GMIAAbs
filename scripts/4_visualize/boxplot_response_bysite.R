@@ -85,7 +85,7 @@ n.cens <- filt.dat.long %>%
 
 
 p <- ggplot(filt.dat.long, aes(site, log10(value))) +
-  geom_boxplot() + 
+  geom_boxplot(position = position_dodge2(preserve = "total")) + 
   facet_wrap(~variable, scales = 'free_y', ncol = 4) +
   geom_text(data = n.cens, aes(x = site, y = y, label = label)) +
   theme_bw() +
