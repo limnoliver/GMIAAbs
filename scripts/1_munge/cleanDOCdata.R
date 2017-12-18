@@ -70,7 +70,7 @@ doc.unique2$Date_formatted <- new.dates
 doc.unique2 <- doc.unique2[,-4]
 doc.unique2 <- unique(doc.unique2)
 
-sample.log <- read_xlsx('M:/NonPoint Evaluation/gmia/SLOH labforms and budget/optics.sample.log.ALL.xlsx')
+sample.log <- read_xlsx('M:/NonPoint Evaluation/gmia/SLOH labforms and budget/optics/optics.sample.log.ALL.xlsx')
 sample.log <- as.data.frame(sample.log[,c(2,6)])
 names(sample.log) <- c('ProjectID', 'KeepDate')
 #sample.log$ProjectID <- gsub("-", ".", sample.log$ProjectID)
