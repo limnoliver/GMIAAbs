@@ -80,7 +80,7 @@ doc.unique3 <- filter(doc.unique3, !is.na(KeepDate))
 
 for (i in 1:nrow(doc.unique3)){
   if (is.na(doc.unique3$Keep[i])){
-    if (length(doc.unique3$ProjectID == doc.unique3$ProjectID[i]) == 1) {
+    if (length(which(doc.unique3$ProjectID == doc.unique3$ProjectID[i])) == 1) {
       doc.unique3$Keep[i] = 1
     } else {
       if (doc.unique3$Date_formatted[i] %in% doc.unique3$KeepDate[i]){
