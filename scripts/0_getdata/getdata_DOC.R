@@ -11,7 +11,7 @@ for (i in 1:length(years)){
   # identify files in each year folder that we want to keep
   # some files have "lenaker" or something else attached to them
   # just use files with dates and no text
-  FilePath <- paste('//Igsarmewwsscu/SCUData/TOC_REPORTS/GMIA_Corsi-Lenaker',years[i],sep='/')
+  FilePath <- paste('//igsarmewvshome/IGSARMEW-genusr/SCUData/TOC_REPORTS/GMIA_Corsi-Lenaker/',years[i],sep='/')
   files <- list.files(FilePath)
   files <- files[grep('.xlsx', files)]
   
