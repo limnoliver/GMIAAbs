@@ -4,7 +4,7 @@ library(RColorBrewer)
 dyes <- read.csv('raw_data/DyeDilution.csv')
 deicers <- read.csv('raw_data/DeicerAbs.csv')
 deicers_ids <- c('Group003GMIA0004', 'Group003GMIA0005')
-location <- "//igsarmewwshg8/HG8Data/Aqualog/AquaLog_Data/2017/20170127/"
+location <- "//igsarmewvshome/igsarmew-genusr/HG8Data/Aqualog/AquaLog_Data/2017/20170127/"
 
 # correct dyes, which were diluted to 5% dye, so correct by *20
 
