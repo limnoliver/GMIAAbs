@@ -36,15 +36,18 @@ deicers <- merge(deicers, deicer_2017_2, all.x = TRUE)
 
 # gather columns so this is in long format
 deicers_long <- select(deicers, -X) %>%
-  gather(key = type, value = value, -Wavelength)
+  gather(key = brand, value = value, -Wavelength)
 
-deicers_long$id <- "Type I"
-deicers_long$id[grep('IV_', deicers_long$type)] <- "Type IV"
-deicers_long$id[grep('pavement', deicers_long$type, ignore.case = T)] <- "Pavement"
+deicers_long$type <- NA
+deicers_long$type[grep('I_', deicers_long$brand)] <- "Type I"
+deicers_long$type[grep('IV_|IV\\.', deicers_long$brand)] <- "Type IV"
+deicers_long$type[grep('pavement', deicers_long$brand, ignore.case = T)] <- "Pavement"
 
-
-
-# plot four panels (type I, type IV, pavement, dyes)
-type.iv <- grep('IV_', names(deicers))
-type.i <- grep('I_', names(deicers))
-pavement <- grep('pavement', names(deicers), ignore.case = TRUE)
+# create an id column that uses the brand coding in the figures
+deicers_long$manufacturer_id <- NA
+deicers_long$manufacturer_id[grep("ucar", deicers_long$brand, ignore.case = T)] <- "A"
+deicers_long$manufacturer_id[grep("kilfrost", deicers_long$brand, ignore.case = T)] <- "B"
+deicers_long$manufacturer_id[grep("cryotech", deicers_long$brand, ignore.case = T)] <- "C"
+deicers_long$manufacturer_id[grep("CPP-I_|CPGA-IV_", deicers_long$brand, ignore.case = T)] <- "C (2017)"
+deicers_long$manufacturer_id[grep("clair|clar", deicers_long$brand, ignore.case = T)] <- "D"
+deicers_long$manufacturer_id[grep("sodium", deicers_long$brand, ignore.case = T)] <- "D"
