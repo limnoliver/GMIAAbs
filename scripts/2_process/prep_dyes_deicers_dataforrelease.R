@@ -39,15 +39,46 @@ deicers_long <- select(deicers, -X) %>%
   gather(key = brand, value = value, -Wavelength)
 
 deicers_long$type <- NA
-deicers_long$type[grep('I_', deicers_long$brand)] <- "Type I"
-deicers_long$type[grep('IV_|IV\\.', deicers_long$brand)] <- "Type IV"
-deicers_long$type[grep('pavement', deicers_long$brand, ignore.case = T)] <- "Pavement"
+deicers_long$type[grep('I_', deicers_long$brand)] <- "Deicer - TypeI"
+deicers_long$type[grep('IV_|IV\\.', deicers_long$brand)] <- "Deicer - Type IV"
+deicers_long$type[grep('sodium', deicers_long$brand, ignore.case = T)] <- "Deicer - Pavement (solid)"
+deicers_long$type[grep('E36', deicers_long$brand, ignore.case = T)] <- "Deicer - Pavement (liquid)"
 
 # create an id column that uses the brand coding in the figures
 deicers_long$manufacturer_id <- NA
-deicers_long$manufacturer_id[grep("ucar", deicers_long$brand, ignore.case = T)] <- "A"
-deicers_long$manufacturer_id[grep("kilfrost", deicers_long$brand, ignore.case = T)] <- "B"
-deicers_long$manufacturer_id[grep("cryotech", deicers_long$brand, ignore.case = T)] <- "C"
-deicers_long$manufacturer_id[grep("CPP-I_|CPGA-IV_", deicers_long$brand, ignore.case = T)] <- "C (2017)"
-deicers_long$manufacturer_id[grep("clair|clar", deicers_long$brand, ignore.case = T)] <- "D"
-deicers_long$manufacturer_id[grep("sodium", deicers_long$brand, ignore.case = T)] <- "D"
+deicers_long$manufacturer_id[grep("ucar", deicers_long$brand, ignore.case = T)] <- "A_2014_F1"
+deicers_long$manufacturer_id[grep("kilfrost", deicers_long$brand, ignore.case = T)] <- "B_2014_F1"
+deicers_long$manufacturer_id[grep("cryotech", deicers_long$brand, ignore.case = T)] <- "C_2014_F1"
+deicers_long$manufacturer_id[grep("CPP-I_|CPGA-IV_", deicers_long$brand, ignore.case = T)] <- "C_2017_F1"
+deicers_long$manufacturer_id[grep("clair|clar", deicers_long$brand, ignore.case = T)] <- "D_2014_F1"
+deicers_long$manufacturer_id[grep("sodium", deicers_long$brand, ignore.case = T)] <- "C_2014_F1"
+
+# check that there is only brand name for each type-manufacturer_id
+# get rid of Clairient.Maxflight.04.Type.IV_Group002GMIA0010_2014.20141216
+# as this was redone and tagged with a "redo"
+
+deicers_long <- filter(deicers_long, 
+                       brand != "Clairient.Maxflight.04.Type.IV_Group002GMIA0010_2014.20141216")
+
+# now distinguish between two different formulas for brand clariant type IV
+deicers_long$manufacturer_id[grep("safewing", deicers_long$brand, ignore.case = T)] <- "D_2014_F1"
+deicers_long$manufacturer_id[grep("maxflight", deicers_long$brand, ignore.case = T)] <- "D_2014_F2"
+
+head(deicers_long)
+
+test <- group_by(deicers_long, type, manufacturer_id) %>%
+  summarize(n())
+
+# bring in and process dyes to create long data frame to add to deicers_long
+names(dyes) <- c("Wavelength", "Orange II", "Sunset Yellow", "Tartrazine", "Erioglycine")
+dyes_long <- gather(dyes, key = manufacturer_id, value = value, -Wavelength)
+dyes_long$type <- "Dye"
+
+dyes_deicers <- select(deicers_long, -brand) %>%
+  bind_rows(dyes_long) %>%
+  select(type, manufacturer_id, Wavelength, value) %>%
+  rename(absorbance = value, id = manufacturer_id, wavelength = Wavelength)
+
+write.csv(dyes_deicers, 'cached_data/dyes_deicers_for_sb.csv', row.names = F)
+
+head(dyes_long)
