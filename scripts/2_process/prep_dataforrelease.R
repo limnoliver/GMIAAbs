@@ -64,7 +64,12 @@ levels(df.pub$variable)[104:105] <- c('4_Methyl_1H_Benzotriazole', '5_Methyl_1H_
 df.pub <- df.pub %>%
   filter(!is.na(value))
 
-write.csv(df.pub, 'cached_data/airport_data_for_sb.csv', row.names = FALSE)
+df.pub.sites <- data.frame(site_no = c('040872015', '040871488', '040871476', '040871475', '040871473'),
+                           site = c('OAK', 'LK', 'CG', 'OUT', 'UP'))
+df.pub.withsites <- left_join(df.pub, df.pub.sites) %>%
+  select(site, site_no, start_date:unit)
+
+write.csv(df.pub.withsites, 'cached_data/airport_data_for_sb.csv', row.names = FALSE)
 
 
 
