@@ -48,7 +48,7 @@ deicers_long <- select(deicers, -X) %>%
   gather(key = brand, value = value, -Wavelength)
 
 deicers_long$type <- NA
-deicers_long$type[grep('I_', deicers_long$brand)] <- "Deicer - TypeI"
+deicers_long$type[grep('I_', deicers_long$brand)] <- "Deicer - Type I"
 deicers_long$type[grep('IV_|IV\\.', deicers_long$brand)] <- "Deicer - Type IV"
 deicers_long$type[grep('sodium', deicers_long$brand, ignore.case = T)] <- "Deicer - Pavement (solid)"
 deicers_long$type[grep('E36', deicers_long$brand, ignore.case = T)] <- "Deicer - Pavement (liquid)"
