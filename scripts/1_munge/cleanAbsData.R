@@ -11,6 +11,8 @@ abscoef$datetime <- strptime(abscoef$date, format = "%Y%m%d")
 # extract site or sample id (e.g., blanks, standards, OUT.W103)
 abscoef$ProjectID <- gsub('(^.+)([[:punct:]]+Group.+)', '\\1', temp)
 
+# keep a running list of QA samples
+samples.qa <- grep("\\.R|blank|standard", abscoef$ProjectID, ignore.case = TRUE, value = TRUE)
 
 # reduce to sites of interest for GMIA
 samples.keep <- grep("out\\.|cg\\.|lk\\.|us\\.|oak\\.", abscoef$ProjectID, ignore.case = TRUE, value = TRUE)
@@ -24,7 +26,8 @@ samples.keep <- samples.keep[-grep('^Q', samples.keep)]
 # get rid of duplicated or diluted samples
 samples.keep <- samples.keep[-grep('dil|dup',samples.keep, ignore.case = TRUE)]
 
-# get rid of random samples that made it through that have long names - think these were runs of the deicers themselves
+# get rid of random samples that made it through that have long names - 
+# think these were runs of the deicers themselves
 samples.keep <- samples.keep[-which(nchar(samples.keep)>12)]
 
 # get rid fo samples that have "Q" after the dash or decimal
@@ -38,7 +41,7 @@ unique.PID <- unique(abscoef.f$ProjectID)
 
 # some duplicate Project IDs left - pull in optics sample log to verify we are using the correct date for each sample
 
-sample.log <- read_xlsx('M:/NonPoint Evaluation/gmia/SLOH labforms and budget/optics.sample.log.ALL.xlsx')
+sample.log <- read_xlsx('M:/NonPoint Evaluation/gmia/SLOH labforms and budget/optics/optics.sample.log.ALL.xlsx')
 names(sample.log)[2] <- 'ProjectID'
 sample.log$ProjectID <- gsub('-', '.', sample.log$ProjectID)
 
