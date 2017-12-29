@@ -10,7 +10,16 @@ deicers_ids <- c('Group003GMIA0004', 'Group003GMIA0005')
 location <- "//igsarmewvshome/igsarmew-genusr/HG8Data/Aqualog/AquaLog_Data/2017/20170127/"
 
 # correct dyes, which were diluted to 5% dye, so correct by *20
+# all dyes were originally dissolved from powder form to liquid to mimick
+# a deicer formula of ~30mg/L of dye
 
+# first, correct for exact concentration to get everything to 30 mg/L
+dyes[,'OrangeII5'] <- dyes[,'OrangeII5']*(30/(1.122/0.040))
+dyes[,'SunsetYellow5'] <- dyes[,'SunsetYellow5']*(30/(1.236/0.040))
+dyes[,'Tartrazine5'] <- dyes[,'Tartrazine5']*(30/(1.249/0.040))
+dyes[,'Erioglycine5'] <- dyes[,'Erioglycine5']*(30/(1.104/0.040))
+
+# then, correct for dilution
 dyes[,2:5] <- 20*dyes[,2:5]
 
 # get type I deicer measured in 2017
