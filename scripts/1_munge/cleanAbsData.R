@@ -12,7 +12,7 @@ abscoef$datetime <- strptime(abscoef$date, format = "%Y%m%d")
 abscoef$ProjectID <- gsub('(^.+)([[:punct:]]+Group.+)', '\\1', temp)
 
 # keep a running list of QA samples
-samples.qa <- grep("\\.R|blank|standard", abscoef$ProjectID, ignore.case = TRUE, value = TRUE)
+samples.qa <- grep("\\.R|blank|standard|Q", abscoef$ProjectID, ignore.case = TRUE, value = TRUE)
 
 # reduce to sites of interest for GMIA
 samples.keep <- grep("out\\.|cg\\.|lk\\.|us\\.|oak\\.", abscoef$ProjectID, ignore.case = TRUE, value = TRUE)
