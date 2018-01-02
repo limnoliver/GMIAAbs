@@ -23,8 +23,8 @@ pavement.cols <- brewer.pal(n = 6, 'Blues')[c(3,6)]
 oranges <- brewer.pal(n = 6, 'Oranges')[c(2,4)]
 dyes.col <- c('orangered', 'orange1', 'yellow2', 'royalblue2')
 # set y axis limits
-type.1.axes <- c(min(dd_dat$absorbance[dd_dat$type == "Deicer - Type I"]), max(dd_dat$absorbance[dd_dat$type == "Deicer - Type I"]))
-type.iv.axes <- c(min(dd_dat$absorbance[dd_dat$type == "Deicer - Type IV"]), max(dd_dat$absorbance[dd_dat$type == "Deicer - Type IV"]))
+type.1.axes <- c(min(dd_dat$absorbance[dd_dat$type == "Type I Deicer"]), max(dd_dat$absorbance[dd_dat$type == "Type I Deicer"]))
+type.iv.axes <- c(min(dd_dat$absorbance[dd_dat$type == "Type IV Deicer"]), max(dd_dat$absorbance[dd_dat$type == "Type IV Deicer"]))
 pavement.axes <- c(min(dd_dat$absorbance[grep('Pavement', dd_dat$type)]), max(dd_dat$absorbance[grep('Pavement', dd_dat$type)]))
 dyes.axes <- c(min(dd_dat$absorbance[dd_dat$type == "Dye"]), max(dd_dat$absorbance[dd_dat$type == "Dye"]))
 
@@ -89,7 +89,7 @@ for(i in 2:4){
   points(dyes$absorbance[dyes$id == dyesids[i]]~dyes$wavelength[dyes$id == dyesids[i]], 
          type = "l", lwd = 2, col = dyes.col[i])
 }
-legend(x = 280, y = 0.135*20, legend = c('Orange II', 'Sunset Yellow', 'Tartrazine', 'Erioglycine'),col = dyes.col, lwd = 2, 
+legend(x = 280, y = 0.131*20, legend = c('Orange II', 'Sunset Yellow', 'Tartrazine', 'Erioglycine'),col = dyes.col, lwd = 2, 
        title = 'Dyes')
 mtext(text = "Wavelength (nm)", side = 1, line = 2.5)
 dev.off()
