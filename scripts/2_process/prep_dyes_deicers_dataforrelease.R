@@ -3,8 +3,15 @@
 library(tidyr)
 library(dplyr)
 
+# source Steve's code to summarize blanks
+source('scripts/2_process/fxn_absMRL.R')
+
+# source Steve's code to correct absorbance values
+source('scripts/2_process/fxn_absMRLAdjust.R')
+
 # read in data
 dyes <- read.csv('raw_data/DyeDilution.csv')
+dyes.blanks <- read.csv('raw_data/DyeBlanks.csv')
 deicers <- read.csv('raw_data/DeicerAbs.csv')
 deicers_ids <- c('Group003GMIA0004', 'Group003GMIA0005')
 location <- "//igsarmewvshome/igsarmew-genusr/HG8Data/Aqualog/AquaLog_Data/2017/20170127/"
@@ -14,13 +21,10 @@ location <- "//igsarmewvshome/igsarmew-genusr/HG8Data/Aqualog/AquaLog_Data/2017/
 # a deicer formula of ~30mg/L of dye
 
 # first, correct for exact concentration to get everything to 30 mg/L
-dyes[,'OrangeII5'] <- dyes[,'OrangeII5']*(30/(1.122/0.040))
-dyes[,'SunsetYellow5'] <- dyes[,'SunsetYellow5']*(30/(1.236/0.040))
-dyes[,'Tartrazine5'] <- dyes[,'Tartrazine5']*(30/(1.249/0.040))
-dyes[,'Erioglycine5'] <- dyes[,'Erioglycine5']*(30/(1.104/0.040))
-
-# then, correct for dilution
-dyes[,2:5] <- 20*dyes[,2:5]
+# dyes[,'OrangeII5'] <- dyes[,'OrangeII5']*(30/(1.122/0.040))
+# dyes[,'SunsetYellow5'] <- dyes[,'SunsetYellow5']*(30/(1.236/0.040))
+# dyes[,'Tartrazine5'] <- dyes[,'Tartrazine5']*(30/(1.249/0.040))
+# dyes[,'Erioglycine5'] <- dyes[,'Erioglycine5']*(30/(1.104/0.040))
 
 # get type I deicer measured in 2017
 all.files <- list.files(path = location)
@@ -43,9 +47,23 @@ deicer_2017_2$`CPGA-IV_` <- deicer_2017_2$`CPGA-IV_`*50
 deicers <- merge(deicers, deicer_2017_1, all.x = TRUE)
 deicers <- merge(deicers, deicer_2017_2, all.x = TRUE)
 
+# Correct deicers for MDL
+# read in raw absorbance data
+abs.raw <- read.csv('raw_data/rawCompiledAbs.csv')
+
+# find lab blanks for correction (not field blanks)
+blankGRnums.deicers <- grep("20141216|20170127", names(abs.raw), value = T)
+blankGRnums.deicers <- grep("blank", blankGRnums.deicers, value = T)
+
+# calculate MRL based on all blank samples
+MRL.deicers <- absMRL(abs.raw, "Wavelength", blankGRnums.deicers)
+
+# correct deicer data
+deicers.corrected <- absMRLAdjust(dfabs = deicers, dfMRLs = MRL.deicers, Wavelength = 'Wavelength', sampleGRnums = names(deicers)[-(1:2)], multiplier = 0.5)
+deicers.corrected <- deicers.corrected[[1]]
+
 # gather columns so this is in long format
-deicers_long <- select(deicers, -X) %>%
-  gather(key = brand, value = value, -Wavelength)
+deicers_long <- gather(deicers.corrected, key = brand, value = value, -Wavelength)
 
 deicers_long$type <- NA
 deicers_long$type[grep('I_', deicers_long$brand)] <- "Deicer - Type I"
@@ -78,9 +96,27 @@ head(deicers_long)
 test <- group_by(deicers_long, type, manufacturer_id) %>%
   summarize(n())
 
+# Do MDL correction (will get rid of negative values) on Dyes
+# in the same way we did for environmental samples
+# Dyes were run by Pellerin lab so need to be corrected separately
+
+# Do MDL correction (will get rid of negative values)
+# in the same way we did for environmental samples
+
+# use blanks to determine MDL
+names(dyes.blanks)[15] <- "Wavelength"
+MRL.all <- absMRL(dyes.blanks, "Wavelength", names(dyes.blanks)[-15])
+
+# adjust values from MRL - here setting to 1/2 MRL
+dyes.corrected <- absMRLAdjust(dfabs = dyes, dfMRLs = MRL.all, Wavelength = 'Wavelength', sampleGRnums = names(dyes)[-1], multiplier = 0.5)
+dyes.corrected <- dyes.corrected[[1]]
+
+# then, correct for dilution
+dyes.corrected[,2:5] <- 20*dyes.corrected[,2:5]
+
 # bring in and process dyes to create long data frame to add to deicers_long
-names(dyes) <- c("Wavelength", "Orange II", "Sunset Yellow", "Tartrazine", "Erioglycine")
-dyes_long <- gather(dyes, key = manufacturer_id, value = value, -Wavelength)
+names(dyes.corrected) <- c("Wavelength", "Orange II", "Sunset Yellow", "Tartrazine", "Erioglycine")
+dyes_long <- gather(dyes.corrected, key = manufacturer_id, value = value, -Wavelength)
 dyes_long$type <- "Dye"
 
 dyes_deicers <- select(deicers_long, -brand) %>%
