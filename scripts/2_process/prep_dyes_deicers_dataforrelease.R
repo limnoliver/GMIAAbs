@@ -32,17 +32,14 @@ file1 <- all.files[grep(paste0(deicers_ids[1], 'ABS.dat'), all.files)]
 deicer_2017_1 <- read.table(paste(location, file1, sep = '/'), header = FALSE)
 names(deicer_2017_1) <- c('Wavelength', 'CPP-I_')
 
-# correct for dilution factor which is 20
 
-deicer_2017_1$`CPP-I_` <- deicer_2017_1$`CPP-I_`*20
 
 # get type IV deicer measured in 2017
 file2 <- all.files[grep(paste0(deicers_ids[2], 'ABS.dat'), all.files)]
 deicer_2017_2 <- read.table(paste(location, file2, sep = '/'), header = FALSE)
 names(deicer_2017_2) <- c('Wavelength', 'CPGA-IV_')
 
-# correct for dilution factor which is 50
-deicer_2017_2$`CPGA-IV_` <- deicer_2017_2$`CPGA-IV_`*50
+
 
 deicers <- merge(deicers, deicer_2017_1, all.x = TRUE)
 deicers <- merge(deicers, deicer_2017_2, all.x = TRUE)
@@ -61,6 +58,12 @@ MRL.deicers <- absMRL(abs.raw, "Wavelength", blankGRnums.deicers)
 # correct deicer data
 deicers.corrected <- absMRLAdjust(dfabs = deicers, dfMRLs = MRL.deicers, Wavelength = 'Wavelength', sampleGRnums = names(deicers)[-(1:2)], multiplier = 0.5)
 deicers.corrected <- deicers.corrected[[1]]
+
+# correct for dilution
+# correct for dilution factor which is 20 or 50 for 2017 data
+
+deicers.corrected$`CPP-I_` <- deicers.corrected$`CPP-I_`*20
+deicers.corrected$`CPGA-IV_` <- deicers.corrected$`CPGA-IV_`*50
 
 # gather columns so this is in long format
 deicers_long <- gather(deicers.corrected, key = brand, value = value, -Wavelength)
@@ -122,7 +125,8 @@ dyes_long$type <- "Dye"
 dyes_deicers <- select(deicers_long, -brand) %>%
   bind_rows(dyes_long) %>%
   select(type, manufacturer_id, Wavelength, value) %>%
-  rename(absorbance = value, id = manufacturer_id, wavelength = Wavelength)
+  rename(absorbance = value, id = manufacturer_id, wavelength = Wavelength) %>%
+  mutate(unit = "AU")
 
 write.csv(dyes_deicers, 'cached_data/dyes_deicers_for_sb.csv', row.names = F)
 
