@@ -41,7 +41,7 @@ plot(typei$absorbance[typei$id == typeiids[4]]~typei$wavelength[typei$id == type
      type = "l", lwd = 2, ylim = type.1.axes, col = type.i.cols[1],
      xlim = c(239, max = 800), xlab = '', ylab = "", xaxt = 'n')
 axis(side = 1, tick = T, labels  = F)
-mtext("Absorbance", side = 2, line = 2.5)
+mtext("Absorbance (AU)", side = 2, line = 2.5)
 for(i in c(3,1,5,2)){
   points(typei$absorbance[typei$id == typeiids[i]]~typei$wavelength[typei$id == typeiids[i]], 
          type = "l", lwd = 2, col = type.i.cols[i])
@@ -71,10 +71,10 @@ plot(pavement$absorbance[pavement$id == pavementids[1]]~pavement$wavelength[pave
       type = "l", lwd = 2, 
      ylim = pavement.axes, 
      col = pavement.cols[1],
-     xlim = c(239, max = 800), xlab = 'Wavelength (nm)', ylab = "Absorbance")
+     xlim = c(239, max = 800), xlab = 'Wavelength (nm)', ylab = "Absorbance (AU)")
 points(pavement$absorbance[pavement$id == pavementids[2]]~pavement$wavelength[pavement$id == pavementids[2]], 
        type = "l", lwd = 2, col = pavement.cols[2])
-mtext("Absorbance", side = 2, line = 2.5)
+mtext("Absorbance (AU)", side = 2, line = 2.5)
 legend('topright', legend = c('c (liquid)', 'c (solid)'),col = pavement.cols, lwd = 2, title = 'Pavement')
 mtext(text = "Wavelength (nm)", side = 1, line = 2.5)
 
