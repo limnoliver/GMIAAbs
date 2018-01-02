@@ -1,12 +1,14 @@
 library(readxl)
+library(dplyr)
 # read in transposed absorbance data where each wavelength has own column
-abscoef <- read.csv('cached_data/transposedAbsCoef.csv', header = TRUE)
+abscoef <- read.csv('cached_data/transposedAbsCoef.csv', header = TRUE, stringsAsFactors = F)
 
 temp <- as.character(abscoef$GRnumber)
 
 # extract date from GRnumber
 abscoef$date <- gsub('(^.+)(_[[:digit:]]{4}\\.)([[:digit:]]{8})', '\\3', temp)
-abscoef$datetime <- strptime(abscoef$date, format = "%Y%m%d")
+abscoef$datetime <- as.Date(abscoef$date, format = "%Y%m%d")
+#abscoef$datetime <- strptime(abscoef$date, format = "%Y%m%d")
 
 # extract site or sample id (e.g., blanks, standards, OUT.W103)
 abscoef$ProjectID <- gsub('(^.+)([[:punct:]]+Group.+)', '\\1', temp)
@@ -68,6 +70,29 @@ abscoef.f <- abscoef.f[abscoef.f$remove == FALSE, ]
 
 write.csv(abscoef.f,'cached_data/cleanedAbsData.csv', row.names = FALSE)
 
+# clean up QA data and export
+qa <- abscoef[abscoef$ProjectID %in% samples.qa, ]
+qa$ProjectID[grep("Standard", qa$ProjectID, ignore.case = T)] <- "1% tea standard"
+qa$ProjectID[grep("blank", qa$ProjectID, ignore.case = T)] <- "blank"
+# drop deicer run
+qa <- qa[-grep("clairient", qa$ProjectID, ignore.case = T), ]
+
+# only keep QA samples that occured on the same date as a sample run that we kept
+qa <- qa[qa$datetime %in% abscoef.f$datetime, ]
+summary(as.factor(qa$ProjectID))
+
+# add qa samples to final data
+abscoef.f <- abscoef.f[,-193]
+abscoef.f.qa <- bind_rows(qa, abscoef.f)
+
+# write full dataset with QA
+write.csv(abscoef.f,'cached_data/cleanedAbsData_withQA.csv', row.names = FALSE)
+
+# write QA dataset that also includes samples that match reps
+# find replicate samples
+rep.matches <- qa$ProjectID[grep("\\.R", qa$ProjectID)]
+rep.matches <- gsub("\\.R", "", rep.matches)
+rep.matches
 # use above cleaning to filter raw samples as well for any further
 # functions that use the raw file but only need appropriate samples
 samples.keep <- as.character(abscoef.f$GRnumber)
