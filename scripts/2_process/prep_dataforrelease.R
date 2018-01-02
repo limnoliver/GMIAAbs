@@ -40,7 +40,8 @@ head(df.rel)
 
 vars <- unique(df.all$variable)
 units <- c('MilligramsPerLiter', 'MilligramsPerLiter', 'MilligramsPerLiter', 'MicrogramsPerLiter', 
-           'MicrogramsPerLiter', 'MilligramsPerLiter', 'MilligramsPerLiter', rep(NA, 98))
+           'MicrogramsPerLiter', 'MilligramsPerLiter', 'MilligramsPerLiter', rep("AU", 2), 
+           rep("PerNanometer", 8), rep("AU", 88))
 units.df <- data.frame(variable = vars,
                     unit = units)
 
