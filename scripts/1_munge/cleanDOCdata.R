@@ -12,22 +12,14 @@ sample.ids <- sample.ids$ProjectID
 # these include blanks and standards
 rows.exclude <- grep('blank*|ppm|unknown|standard*|std|dilution', doc.raw$ProjectID, ignore.case = TRUE)
 doc.cleaned <- doc.raw[-rows.exclude, ]
-doc.qa <- doc.raw[rows.exclude, ]
 
-# clean up doc.qa ProjectIDs a bit
-summary(as.factor(doc.qa$ProjectID))
-doc.qa$ProjectID[grep("1 ppm|1ppm", doc.qa$ProjectID, ignore.case = T)] <- "1 ppm standard"
-doc.qa$ProjectID[grep("10 ppm|10ppm", doc.qa$ProjectID, ignore.case = T)] <- "10 ppm standard"
-doc.qa$ProjectID[grep("20 ppm|20ppm", doc.qa$ProjectID, ignore.case = T)] <- "20 ppm standard"
-doc.qa$ProjectID[grep("blank", doc.qa$ProjectID, ignore.case = T)] <- "blank"
+# get field blanks, which are denoted with "Q"
+field.blanks <- grep("q", doc.raw$ProjectID, ignore.case = T, value = T)
+field.blanks <- field.blanks[-grep("WQ", field.blanks)] # get rid of random water quality samples labeled "WQ"
+field.blanks <- field.blanks[-grep("-R", field.blanks)] # get rid of field blank replicate
+field.blanks <- field.blanks[-grep("PQ", field.blanks)] # get rid of OUT storm sample that is labeled "PG"
+field.blanks <- doc.raw[doc.raw$ProjectID %in% field.blanks, ] # 
 
-# drop "standards" which don't have any measured value and come from a single date
-# as well as "unknown" samples 
-# as well as "dilution water" samples
-doc.qa <- doc.qa[-grep("stds|standards", doc.qa$ProjectID, ignore.case = T),]
-doc.qa <- doc.qa[-grep("unknown", doc.qa$ProjectID, ignore.case = T),]
-doc.qa <- doc.qa[-grep("dilution water", doc.qa$ProjectID, ignore.case = T),]
-doc.qa <- doc.qa[!is.na(doc.qa$DOC), ]
 
 # get rid of rows with no info in them, either ProjectID or DOC
 doc.cleaned <- doc.cleaned[!is.na(doc.cleaned$DOC), ]
@@ -91,8 +83,8 @@ doc.unique2 <- doc.unique2[,-4]
 doc.unique2 <- unique(doc.unique2)
 
 # get new dates for doc qa data as well
-new.dates.qa <- new.dates.fun(doc.qa$Date)
-doc.qa$Date_formatted <- new.dates.qa
+new.dates.field.blanks <- new.dates.fun(field.blanks$Date)
+field.blanks$Date_formatted <- new.dates.field.blanks
 
 sample.log <- read_xlsx('M:/NonPoint Evaluation/gmia/SLOH labforms and budget/optics/optics.sample.log.ALL.xlsx')
 sample.log <- as.data.frame(sample.log[,c(2,6)])
@@ -130,18 +122,18 @@ doc.unique3 <- subset(doc.unique3, !(doc.unique3$ProjectID == "US.S111G" & doc.u
 # create QA dataset as well
 # keep only qa values from the same date as samples
 sample.dates <- unique(doc.unique3$Date_formatted)
-doc.qa <- filter(doc.qa, Date_formatted %in% sample.dates)
-doc.qa <- select(doc.qa, ProjectID, DOC, Date_formatted)
-doc.qa <- unique(doc.qa)
+field.blanks <- filter(field.blanks, Date_formatted %in% sample.dates)
+field.blanks <- select(field.blanks, ProjectID, DOC, Date_formatted)
+field.blanks <- unique(field.blanks)
 
 # summarize QA data
-doc.qa.summary <- group_by(doc.qa, ProjectID) %>%
+field.blanks.summary <- group_by(field.blanks, ProjectID) %>%
   summarize_at(vars(DOC), funs(mean, median, sd))
 
 # write a qa dataset
-write.csv(doc.qa, "cached_data/QA_DOCdata.csv", row.names = F)
+write.csv(field.blanks, "cached_data/QA_DOCdata.csv", row.names = F)
 
 # write a dataset of both qa and samples
-doc.qa <- bind_rows(doc.qa, doc.unique3)
-write.csv(doc.qa, 'cached_data/cleanedDOC_withQA.csv', row.names = FALSE)
+field.blanks <- bind_rows(field.blanks, doc.unique3)
+write.csv(field.blanks, 'cached_data/cleanedDOC_withQA.csv', row.names = FALSE)
 write.csv(doc.unique3, 'cached_data/cleanedDOCdata.csv', row.names = FALSE)
