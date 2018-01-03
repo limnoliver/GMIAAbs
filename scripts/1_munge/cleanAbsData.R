@@ -15,6 +15,11 @@ abscoef$ProjectID <- gsub('(^.+)([[:punct:]]+Group.+)', '\\1', temp)
 
 # keep a running list of QA samples
 samples.qa <- grep("\\.R|blank|standard|Q", abscoef$ProjectID, ignore.case = TRUE, value = TRUE)
+samples.qa <- grep("Q", samples.qa, ignore.case = TRUE, value = TRUE) #narrow to QA samples that are field blanks
+samples.qa <- samples.qa[-grep("^Q$", samples.qa, ignore.case = T)] # get rid of MQ water blanks
+samples.qa <- samples.qa[-grep("PQ", samples.qa, ignore.case = T)] # get rid of storm sample with "Q" in name
+samples.qa <- samples.qa[-grep("\\.R", samples.qa, ignore.case = T)] # get rid of field blank reps
+
 
 # reduce to sites of interest for GMIA
 samples.keep <- grep("out\\.|cg\\.|lk\\.|us\\.|oak\\.", abscoef$ProjectID, ignore.case = TRUE, value = TRUE)
@@ -72,14 +77,9 @@ write.csv(abscoef.f,'cached_data/cleanedAbsData.csv', row.names = FALSE)
 
 # clean up QA data and export
 qa <- abscoef[abscoef$ProjectID %in% samples.qa, ]
-qa$ProjectID[grep("Standard", qa$ProjectID, ignore.case = T)] <- "1% tea standard"
-qa$ProjectID[grep("blank", qa$ProjectID, ignore.case = T)] <- "blank"
-# drop deicer run
-qa <- qa[-grep("clairient", qa$ProjectID, ignore.case = T), ]
 
-# only keep QA samples that occured on the same date as a sample run that we kept
-qa <- qa[qa$datetime %in% abscoef.f$datetime, ]
-summary(as.factor(qa$ProjectID))
+# write QA data
+write.csv(qa, "cached_data/QA_Absdata.csv", row.names = F)
 
 # add qa samples to final data
 abscoef.f <- abscoef.f[,-193]
@@ -88,15 +88,4 @@ abscoef.f.qa <- bind_rows(qa, abscoef.f)
 # write full dataset with QA
 write.csv(abscoef.f,'cached_data/cleanedAbsData_withQA.csv', row.names = FALSE)
 
-# write QA dataset that also includes samples that match reps
-# find replicate samples
-rep.matches <- qa$ProjectID[grep("\\.R", qa$ProjectID)]
-rep.matches <- gsub("\\.R", "", rep.matches)
-rep.matches
-# use above cleaning to filter raw samples as well for any further
-# functions that use the raw file but only need appropriate samples
-samples.keep <- as.character(abscoef.f$GRnumber)
-
-# read in raw data
-abs.raw <- read.csv('raw_data/rawCompiledAbs.csv')
 
