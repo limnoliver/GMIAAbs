@@ -120,15 +120,8 @@ doc.unique3$ProjectID <- gsub("-", ".", doc.unique3$ProjectID)
 doc.unique3 <- subset(doc.unique3, !(doc.unique3$ProjectID == "US.S111G" & doc.unique3$DOC == 65))
 
 # create QA dataset as well
-# keep only qa values from the same date as samples
-sample.dates <- unique(doc.unique3$Date_formatted)
-field.blanks <- filter(field.blanks, Date_formatted %in% sample.dates)
 field.blanks <- select(field.blanks, ProjectID, DOC, Date_formatted)
 field.blanks <- unique(field.blanks)
-
-# summarize QA data
-field.blanks.summary <- group_by(field.blanks, ProjectID) %>%
-  summarize_at(vars(DOC), funs(mean, median, sd))
 
 # write a qa dataset
 write.csv(field.blanks, "cached_data/QA_DOCdata.csv", row.names = F)
