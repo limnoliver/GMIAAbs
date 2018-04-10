@@ -57,6 +57,7 @@ MRL.deicers <- absMRL(abs.raw, "Wavelength", blankGRnums.deicers)
 
 # correct deicer data
 deicers.corrected <- absMRLAdjust(dfabs = deicers, dfMRLs = MRL.deicers, Wavelength = 'Wavelength', sampleGRnums = names(deicers)[-(1:2)], multiplier = 0.5)
+deicer.censored <- deicers.corrected[[2]]
 deicers.corrected <- deicers.corrected[[1]]
 
 # correct for dilution
@@ -64,6 +65,17 @@ deicers.corrected <- deicers.corrected[[1]]
 
 deicers.corrected$`CPP-I_` <- deicers.corrected$`CPP-I_`*20
 deicers.corrected$`CPGA-IV_` <- deicers.corrected$`CPGA-IV_`*50
+
+# create dataframe to show where "<" or censored values occur
+vars <- names(deicer.censored)[2:15]
+for (temp_column in vars) {
+  cen.rows <- grep('<', deicer.censored[,temp_column])
+  deicer.censored[,temp_column] <- NA
+  deicer.censored[cen.rows,temp_column] <- "<"
+
+}
+
+deicers_censored_long <- gather(deicer.censored, key = brand, value = censored, -Wavelength)
 
 # gather columns so this is in long format
 deicers_long <- gather(deicers.corrected, key = brand, value = value, -Wavelength)
@@ -82,6 +94,9 @@ deicers_long$manufacturer_id[grep("cryotech", deicers_long$brand, ignore.case = 
 deicers_long$manufacturer_id[grep("CPP-I_|CPGA-IV_", deicers_long$brand, ignore.case = T)] <- "C_2017_F1"
 deicers_long$manufacturer_id[grep("clair|clar", deicers_long$brand, ignore.case = T)] <- "D_2014_F1"
 deicers_long$manufacturer_id[grep("sodium", deicers_long$brand, ignore.case = T)] <- "C_2014_F1"
+
+# add column for censored values
+deicers_long$censored <- deicers_censored_long$censored
 
 # check that there is only brand name for each type-manufacturer_id
 # get rid of Clairient.Maxflight.04.Type.IV_Group002GMIA0010_2014.20141216
@@ -112,19 +127,34 @@ MRL.all <- absMRL(dyes.blanks, "Wavelength", names(dyes.blanks)[-15])
 
 # adjust values from MRL - here setting to 1/2 MRL
 dyes.corrected <- absMRLAdjust(dfabs = dyes, dfMRLs = MRL.all, Wavelength = 'Wavelength', sampleGRnums = names(dyes)[-1], multiplier = 0.5)
+censored <- dyes.corrected[[2]]
 dyes.corrected <- dyes.corrected[[1]]
 
 # then, correct for dilution
 dyes.corrected[,2:5] <- 20*dyes.corrected[,2:5]
 
+# create dataframe to show where "<" or censored values occur
+vars <- names(censored)[2:5]
+for (temp_column in vars) {
+  cen.rows <- grep('<', censored[,temp_column])
+  censored[,temp_column] <- as.character(censored[,temp_column])
+  censored[cen.rows,temp_column] <- "<"
+  censored[-cen.rows, temp_column] <- NA
+}
+
+# create long format of censored vals
+names(censored) <- c("Wavelength", "Orange II", "Sunset Yellow", "Tartrazine", "Erioglycine")
+censored_long <- gather(censored, key = manufacturer_id, value = censored, -Wavelength)
+
 # bring in and process dyes to create long data frame to add to deicers_long
 names(dyes.corrected) <- c("Wavelength", "Orange II", "Sunset Yellow", "Tartrazine", "Erioglycine")
 dyes_long <- gather(dyes.corrected, key = manufacturer_id, value = value, -Wavelength)
 dyes_long$type <- "Dye"
+dyes_long$censored <- censored_long$censored
 
 dyes_deicers <- select(deicers_long, -brand) %>%
   bind_rows(dyes_long) %>%
-  select(type, manufacturer_id, Wavelength, value) %>%
+  select(type, manufacturer_id, Wavelength, value, censored) %>%
   rename(absorbance = value, id = manufacturer_id, wavelength = Wavelength) %>%
   mutate(unit = "AU")
 
