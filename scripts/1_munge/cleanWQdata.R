@@ -1,6 +1,7 @@
 # this script filters and cleans wq data
 # for eventual merging with absorbance data
 library(dplyr)
+source('scripts/0_getdata/getdata_waterquality.R')
 wq_data <- read.csv('raw_data/rawWQdata.csv', check.names = FALSE)
 
 # project ID is hidden in unnamed column "X__1"
