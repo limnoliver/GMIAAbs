@@ -18,30 +18,30 @@ formatAbsSamplesRevised <- function(dateLower,dateUpper,Type,Project){
 #   dateRangeFiles <- dateRangeFiles[which(dateRangeFiles >= dateLower)]  
 #   dateRangeFiles <- dateRangeFiles[which(dateRangeFiles!='2014')]
   
-  dateRangeFilesb <- list.files(path='//igsarmewwshg9/HG9Data/AquaLog/AquaLog_Data/2013')
+  dateRangeFilesb <- list.files(path='//IGSARMEWVSHOME/IGSARMEW-genusr/HG8Data/Aqualog/AquaLog_Data/2013')
   dateRangeFilesb <- dateRangeFilesb[which(dateRangeFilesb <= dateUpper)]
   dateRangeFilesb <- dateRangeFilesb[which(dateRangeFilesb >= dateLower)]  
   dateRangeFilesb <- paste('2013/',dateRangeFilesb,sep="")
   
-  dateRangeFilesc <- list.files(path='//igsarmewwshg9/HG9Data/AquaLog/AquaLog_Data/2014')
+  dateRangeFilesc <- list.files(path='//IGSARMEWVSHOME/IGSARMEW-genusr/HG8Data/Aqualog/AquaLog_Data/2014')
   dateRangeFilesc <- dateRangeFilesc[which(dateRangeFilesc <= dateUpper)]
   dateRangeFilesc <- dateRangeFilesc[which(dateRangeFilesc >= dateLower)]
   dateRangeFilesc <- dateRangeFilesc[which(nchar(dateRangeFilesc)<10)]
   dateRangeFilesc <- paste('2014/',dateRangeFilesc,sep="")
   
-  dateRangeFilesd <- list.files(path='//igsarmewwshg9/HG9Data/AquaLog/AquaLog_Data/2015')
+  dateRangeFilesd <- list.files(path='//IGSARMEWVSHOME/IGSARMEW-genusr/HG8Data/Aqualog/AquaLog_Data/2015')
   dateRangeFilesd <- dateRangeFilesd[which(dateRangeFilesd <= dateUpper)]
   dateRangeFilesd <- dateRangeFilesd[which(dateRangeFilesd >= dateLower)]
   dateRangeFilesd <- dateRangeFilesd[which(nchar(dateRangeFilesd)<10)]
   dateRangeFilesd <- paste('2015/',dateRangeFilesd,sep="")
   
-  dateRangeFilese <- list.files(path='//igsarmewwshg9/HG9Data/AquaLog/AquaLog_Data/2016')
+  dateRangeFilese <- list.files(path='//IGSARMEWVSHOME/IGSARMEW-genusr/HG8Data/Aqualog/AquaLog_Data/2016')
   dateRangeFilese <- dateRangeFilese[which(dateRangeFilese <= dateUpper)]
   dateRangeFilese <- dateRangeFilese[which(dateRangeFilese >= dateLower)]
   dateRangeFilese <- dateRangeFilese[which(nchar(dateRangeFilese)<10)]
   dateRangeFilese <- paste('2016/',dateRangeFilese,sep="")
   
-  dateRangeFilesf <- list.files(path='//igsarmewwshg8/HG8Data/Aqualog/AquaLog_Data/2017')
+  dateRangeFilesf <- list.files(path='//IGSARMEWVSHOME/IGSARMEW-genusr/HG8Data/Aqualog/AquaLog_Data/2017')
   dateRangeFilesf <- dateRangeFilesf[which(dateRangeFilesf <= dateUpper)]
   dateRangeFilesf <- dateRangeFilesf[which(dateRangeFilesf >= dateLower)]
   dateRangeFilesf <- dateRangeFilesf[which(nchar(dateRangeFilesf)<10)]
@@ -65,10 +65,10 @@ formatAbsSamplesRevised <- function(dateLower,dateUpper,Type,Project){
 
   for(i in 1:length(dateRangeFiles)){
     if (length(grep("2017/", dateRangeFiles[i])) == 1) {
-      fileName <- paste('//igsarmewwshg8/HG8Data/Aqualog/AquaLog_Data',dateRangeFiles[i],sep='/')
+      fileName <- paste('//IGSARMEWVSHOME/IGSARMEW-genusr/HG8Data/Aqualog/AquaLog_Data',dateRangeFiles[i],sep='/')
       cat(paste(i,fileName,'\n',sep="\n"))
     } else {
-    fileName <- paste('//igsarmewwshg9/HG9Data/AquaLog/AquaLog_Data',dateRangeFiles[i],sep='/')
+    fileName <- paste('//IGSARMEWVSHOME/IGSARMEW-genusr/HG8Data/Aqualog/AquaLog_Data',dateRangeFiles[i],sep='/')
     cat(paste(i,fileName,'\n',sep="\n"))
     }
     setwd(fileName)
@@ -93,7 +93,7 @@ formatAbsSamplesRevised <- function(dateLower,dateUpper,Type,Project){
         filename = filename[-discard]
       }
       DescriptionFile <- read_xlsx(filename[grep('.xlsx', filename)],col_names=TRUE,na = c("", NA, "HH:MM:SS", "MM/DD/YYYY"))
-      if (length(grep("X_", names(DescriptionFile)))>0) {
+      if (length(grep("X_", names(DescriptionFile)))>0 | length(grep('DOA', names(DescriptionFile))) >0) {
         DescriptionFile <- read_xlsx(filename[grep('.xlsx', filename)],col_names=TRUE, skip=10,na = c("", NA, "HH:MM:SS", "MM/DD/YYYY"))
       }
       
