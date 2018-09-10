@@ -20,12 +20,20 @@ samples.qa <- samples.qa[-grep("^Q$", samples.qa, ignore.case = T)] # get rid of
 samples.qa <- samples.qa[-grep("PQ", samples.qa, ignore.case = T)] # get rid of storm sample with "Q" in name
 samples.qa <- samples.qa[-grep("\\.R", samples.qa, ignore.case = T)] # get rid of field blank reps
 
+# pull out field reps and associated samples and write file
+# field_reps <-  grep("\\.R", abscoef$ProjectID, value = TRUE)
+# matching_samples <- gsub('\\.R', '', field_reps)
+# 
+# field_rep_dat <- dplyr::filter(abscoef, ProjectID %in% c(field_reps, matching_samples))
+# 
+# write.csv('abs_field_reps.csv', row.names = FALSE)
+
 
 # reduce to sites of interest for GMIA
 samples.keep <- grep("out\\.|cg\\.|lk\\.|us\\.|oak\\.", abscoef$ProjectID, ignore.case = TRUE, value = TRUE)
 
 # get rid of replicates/redos
-samples.keep <- samples.keep[-grep('\\.R|redo', samples.keep, ignore.case = TRUE)]
+#samples.keep <- samples.keep[-grep('redo', samples.keep, ignore.case = TRUE)]
 
 # get rid of quality control samples
 samples.keep <- samples.keep[-grep('^Q', samples.keep)]
